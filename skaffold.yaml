@@ -1,7 +1,6 @@
 apiVersion: skaffold/v4beta9
 kind: Config
-metadata:
-  name: climb-service
+
 build:
   local:
     push: true
@@ -9,9 +8,10 @@ build:
   platforms: ["linux/amd64"]
 
   artifacts:
-  - image: gcr.io/climbing-app-424905/climb_service
-    docker:
-      dockerfile: ./Dockerfile
+    - image: gcr.io/climbing-app-424905/climb_service
+      docker:
+        dockerfile: Dockerfile.binary
+
 
 manifests:
   rawYaml:

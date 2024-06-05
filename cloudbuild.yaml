@@ -34,13 +34,12 @@ steps:
       - '-c'
       - |
         # Authenticate with Google Cloud
-        # gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
         # Create a new release in the delivery pipeline
         gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \
           --delivery-pipeline=climb-service-pipeline \
           --region=us-south1 \
-          --images=climb_service=gcr.io/$PROJECT_ID/climb_service:$(date +%Y%m%d%H%M%S)
+          --images=climb_service=gcr.io/climbing-app-424905/climb_service:$(date +%Y%m%d%H%M%S)
 
 artifacts:
   objects:

@@ -23,7 +23,7 @@ RUN cargo build --release
 FROM debian:buster-slim
 
 # Copy the binary from the builder stage
-COPY --from=builder /usr/src/myapp/target/release/myapp /usr/local/bin/myapp
+COPY --from=builder /usr/src/climb_service/target/release/climb_service /usr/local/bin/climb_service
 
 # Set the command to run the binary
 CMD ["myapp"]

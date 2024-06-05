@@ -7,7 +7,7 @@ steps:
       - |
         # Install Rust and Cargo
         curl https://sh.rustup.rs -sSf | sh -s -- -y
-        source $HOME/.cargo/env
+        source ~/.cargo/env
 
         # Verify installation
         rustc --version
@@ -34,7 +34,7 @@ steps:
       - '-c'
       - |
         # Authenticate with Google Cloud
-        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+        # gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
         # Create a new release in the delivery pipeline
         gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \

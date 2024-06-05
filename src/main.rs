@@ -18,7 +18,7 @@ async fn main() -> io::Result<()>  {
             // register HTTP requests handlers
             .service(hello)
     })
-        .bind("0.0.0.0:9090")?
+        .bind("0.0.0.0:8080")?
         .run()
         .await
 }

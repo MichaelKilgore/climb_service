@@ -16,6 +16,8 @@ RUN rm -rf src
 # Copy the source code to the container
 COPY . .
 
+EXPOSE 8080
+
 # Build the project
 RUN cargo build --release
 

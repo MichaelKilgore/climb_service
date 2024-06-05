@@ -1,55 +1,22 @@
 steps:
-  # Step 1: Build the Rust project
   - name: 'rust:latest'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        # Install Rust and Cargo
-        curl https://sh.rustup.rs -sSf | sh -s -- -y
-        source ~/.cargo/env
-
-        # Verify installation
-        rustc --version
-        cargo --version
-
-        # Build the project
         cargo build --release
 
-        # Run tests
-        cargo test --release
-
-        # Copy the built artifact to the output directory
-        mkdir -p /workspace/out
-        cp target/release/climb_service /workspace/out/
-
-  # Step 2: Upload the artifact to Google Cloud Storage
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', '/workspace/out/climb_service', 'gs://climb-service-image-store-bucket/rust_app/climb_service']
-
-  # Step 3: Create a new release in Google Cloud Deploy
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
+  - name: 'gcr.io/cloud-builders/docker'
     args:
-      - '-c'
-      - |
-        # Create a new release in the delivery pipeline
-        gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \
-          --delivery-pipeline=climb-service-pipeline \
-          --region=us-south1 \
-          --images=climb_service=gs://climb-service-image-store-bucket/rust_app/climb_service \
-          --source . \
-          --skaffold-version=2.10 \
-          --skaffold-file=skaffold.yaml	
+      - build
+      - '-t'
+      - 'gcr.io/climbing-app-424905/my-rust-app:latest'
+      - '.'
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - push
+      - 'gcr.io/climbing-app-424905/my-rust-app:latest'
 
-artifacts:
-  objects:
-    location: gs://climb-service-image-store-bucket/rust_app/
-    paths:
-      - /workspace/out/climb_service
-
-timeout: "1200s"  # Set an appropriate timeout for your build
-
-
-
+images:
+  - 'gcr.io/climbing-app-424905/my-rust-app:latest'

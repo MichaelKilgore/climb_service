@@ -37,7 +37,9 @@ steps:
         gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \
           --delivery-pipeline=climb-service-pipeline \
           --region=us-south1 \
-          --images=climb_service=gs://climb-service-image-store-bucket/rust_app/climb_service
+          --images=climb_service=gs://climb-service-image-store-bucket/rust_app/climb_service \
+          --source . \
+          --skaffold-file=skaffold.yaml	
 
 artifacts:
   objects:

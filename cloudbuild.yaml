@@ -39,7 +39,7 @@ steps:
           --region=us-south1 \
           --images=climb_service=gs://climb-service-image-store-bucket/rust_app/climb_service \
           --source . \
-          --skaffold-version="skaffold/v4beta11" \
+          --skaffold-version="skaffold/v4beta9" \
           --skaffold-file=skaffold.yaml	
 
 

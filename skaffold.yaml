@@ -1,0 +1,22 @@
+piVersion: skaffold/v4beta6
+kind: Config
+
+build:
+  local:
+    push: true
+
+  platforms: ["linux/amd64"] # <- Specific platform supported by Cloud Run
+
+  artifacts:
+    - image: gcr.io/climbing-app-424905/my-rust-app:latest
+      docker:
+        dockerfile: ./Dockerfile2
+
+manifests:
+  rawYaml:
+    - resources/service.yaml
+
+deploy:
+  cloudrun:
+    projectid: climbing-app-424905
+    region: us-south1

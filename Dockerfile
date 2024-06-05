@@ -2,7 +2,7 @@
 FROM rust:latest AS builder
 
 # Set the working directory inside the container
-WORKDIR /usr/src/myapp
+WORKDIR /usr/src/climb_service
 
 # Copy the Cargo.toml and Cargo.lock files to the container
 COPY Cargo.toml Cargo.lock ./

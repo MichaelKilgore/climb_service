@@ -33,13 +33,11 @@ steps:
     args:
       - '-c'
       - |
-        # Authenticate with Google Cloud
-
         # Create a new release in the delivery pipeline
         gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \
           --delivery-pipeline=climb-service-pipeline \
           --region=us-south1 \
-          --images=climb_service=gcr.io/climbing-app-424905/climb_service:$(date +%Y%m%d%H%M%S)
+          --images=climb_service=gs://climb-service-image-store-bucket/rust_app/climb_service
 
 artifacts:
   objects:

@@ -11,5 +11,16 @@ steps:
       - push
       - 'gcr.io/climbing-app-424905/my-rust-app:latest'
 
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Create a new release in the delivery pipeline
+        gcloud deploy releases create release-$(date +%Y%m%d%H%M%S) \
+          --delivery-pipeline=climb-service-pipeline \
+          --region=us-south1 \
+          --images=climb_service=gcr.io/climbing-app-424905/my-rust-app:latest \
+
 images:
   - 'gcr.io/climbing-app-424905/my-rust-app:latest'

@@ -6,11 +6,7 @@ build:
   artifacts:
   - image: gcr.io/climbing-app-424905/climb_service
 deploy:
-  googleCloudDeploy:
-    deliveryPipeline: climb-service-pipeline
+  cloudrun:
     region: us-south1
-    targets:
-      - targetId: beta
-        run:
-          location: us-south1
-          service: climb-service
+    project: climbing-app-424905
+    service: climb-service

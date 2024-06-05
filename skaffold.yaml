@@ -3,10 +3,14 @@ kind: Config
 metadata:
   name: climb-service
 build:
+  local:
+    push: true
+  platforms: ["linux/amd64"]
   artifacts:
   - image: gcr.io/climbing-app-424905/climb_service
+    docker:
+      dockerfile: ./Dockerfile
 deploy:
   cloudrun:
     region: us-south1
-    project: climbing-app-424905
-    service: climb-service
+    projectid: climbing-app-424905

@@ -2,8 +2,11 @@ apiVersion: skaffold/v4beta9
 kind: Service
 metadata:
   name: cloud-run-service
+  namespace: default
 spec:
   template:
     spec:
       containers:
       - image: gcr.io/climbing-app-424905/climb_service
+        ports:
+        - containerPort: 8080

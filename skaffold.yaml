@@ -5,11 +5,18 @@ metadata:
 build:
   local:
     push: true
+
   platforms: ["linux/amd64"]
+
   artifacts:
   - image: gcr.io/climbing-app-424905/climb_service
     docker:
       dockerfile: ./Dockerfile
+
+manifests:
+  rawYaml:
+    - resources/service.yaml
+
 deploy:
   cloudrun:
     region: us-south1

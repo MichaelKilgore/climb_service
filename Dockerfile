@@ -1,8 +1,3 @@
-FROM rust:latest as builder
-WORKDIR /usr/src/myapp
-COPY . .
-RUN cargo install --path .
-
 # stage 1: Build the Rust project
 FROM rust:latest AS builder
 

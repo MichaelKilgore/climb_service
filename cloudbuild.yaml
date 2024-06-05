@@ -1,11 +1,4 @@
 steps:
-  - name: 'rust:latest'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        cargo build --release
-
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build

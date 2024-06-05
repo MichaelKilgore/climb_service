@@ -3,7 +3,7 @@ WORKDIR /usr/src/myapp
 COPY . .
 RUN cargo install --path .
 
-tage 1: Build the Rust project
+# stage 1: Build the Rust project
 FROM rust:latest AS builder
 
 # Set the working directory inside the container

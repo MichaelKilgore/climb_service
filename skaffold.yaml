@@ -9,9 +9,9 @@ build:
 
   artifacts:
     - image: gcr.io/$_PROJECT_ID/my-rust-app
-      buildArgs:
-        _PROJECT_ID: $_PROJECT_ID
       docker:
+        buildArgs:
+          _PROJECT_ID: $_PROJECT_ID
         dockerfile: ./Dockerfile2
 
 manifests:

@@ -4,6 +4,10 @@ steps:
       - build
       - '-t'
       - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
+      - '--build-arg'
+      - '_PROJECT_ID=${_PROJECT_ID}'
+      - '--build-arg'
+      - '_DEFAULT_REGION=${_DEFAULT_REGION}'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'

@@ -28,4 +28,4 @@ FROM debian:buster-slim
 COPY --from=builder /usr/src/climb_service/target/release/climb_service /usr/local/bin/climb_service
 
 # Set the command to run the binary
-CMD ["myapp"]
+CMD ["/usr/local/bin/climb_service"]

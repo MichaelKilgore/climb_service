@@ -1,24 +1,9 @@
 steps:
-  # Preprocess skaffold.yaml to replace placeholders with actual values
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        sed -i "s/\$_PROJECT_ID/${_PROJECT_ID}/g" /workspace/skaffold.yaml
-        sed -i "s/\$_DEFAULT_REGION/${_DEFAULT_REGION}/g" /workspace/skaffold.yaml
-        sed -i "s/\$_PROJECT_ID/${_PROJECT_ID}/g" /workspace/resources/service.yaml
-        sed -i "s/\$_DEFAULT_REGION/${_DEFAULT_REGION}/g" /workspace/resources/service.yaml
-
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
       - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
-      - '--build-arg'
-      - '_PROJECT_ID=${_PROJECT_ID}'
-      - '--build-arg'
-      - '_DEFAULT_REGION=${_DEFAULT_REGION}'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'

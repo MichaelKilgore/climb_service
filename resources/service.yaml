@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: cloud-run-service
+  name: beta-cloud-run
 spec:
   template:
     spec:

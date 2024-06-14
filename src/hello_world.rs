@@ -5,5 +5,5 @@ pub async fn hello() -> HttpResponse {
 
     HttpResponse::Ok()
         .content_type(ContentType::json())
-        .json("{\"message\": \"hello world!\"}")
+        .json("{\"message\": \"hello Michael!\"}")
 }

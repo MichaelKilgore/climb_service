@@ -8,10 +8,8 @@ build:
   platforms: ["linux/amd64"] # <- Specific platform supported by Cloud Run
 
   artifacts:
-    - image: gcr.io/$_PROJECT_ID/my-rust-app
+    - image: gcr.io/climbing-app-424905/my-rust-app
       docker:
-        buildArgs:
-          _PROJECT_ID: $_PROJECT_ID
         dockerfile: ./Dockerfile2
 
 manifests:
@@ -20,5 +18,5 @@ manifests:
 
 deploy:
   cloudrun:
-    projectid: $_PROJECT_ID
-    region: $_DEFAULT_REGION
+    projectid: "climbing-app-424905"
+    region: "us-south1"

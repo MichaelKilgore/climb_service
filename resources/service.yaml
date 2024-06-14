@@ -6,5 +6,5 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/$_PROJECT_ID/my-rust-app
+      - image: gcr.io/climbing-app-424905/my-rust-app
 

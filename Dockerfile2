@@ -1,1 +1,1 @@
-FROM gcr.io/climbing-app-424905/my-rust-app:latest
+FROM gcr.io/climbing-app-426701/my-rust-app:latest

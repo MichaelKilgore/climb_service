@@ -1,10 +1,16 @@
-mod hello_world;
-
-use actix_web::{App, HttpServer, middleware};
-use actix_rt::{main};
-use std::io;
-use hello_world::{hello};
 use std::env;
+use std::io;
+
+use actix_rt::main;
+use actix_web::App;
+use actix_web::HttpServer;
+use actix_web::middleware;
+
+use crate::activities::create_climbing_location::create_climbing_location;
+use crate::activities::hello_world::hello;
+
+mod activities;
+mod model;
 
 #[main]
 async fn main() -> io::Result<()>  {
@@ -16,6 +22,7 @@ async fn main() -> io::Result<()>  {
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             // register HTTP requests handlers
+            .service(create_climbing_location)
             .service(hello)
     })
         .bind("0.0.0.0:8080")?

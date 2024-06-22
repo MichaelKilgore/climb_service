@@ -1,0 +1,1 @@
+pub mod climbing_location;

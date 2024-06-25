@@ -20,7 +20,7 @@ pub async fn create_climbing_location(mut location: Json<ClimbingLocation>) -> H
     // "host=34.30.64.62 user=postgres"
     // "host=localhost user=postgres password=Montero17$"
     eprintln!("ASFAF");
-    let client = connect("host=34.30.64.62 user=postgres password=postgres sslmode=disable dbname=postgres").await;
+    let client = connect("host=/cloudsql/climbing-app-426701:us-central1:postgres-instance/.s.PGSQL.5432 user=postgres password=postgres sslmode=disable dbname=postgres").await;
     eprintln!("HELLO WORLD");
 
     let messages = client

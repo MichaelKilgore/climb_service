@@ -28,9 +28,10 @@ curl http://127.0.0.1:8080/hello
 
 curl -X POST \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
      -d @test_payloads/create_climbing_location.json \
      https://beta.climb-service.dev/create-climbing-location
 
 ### hello
 
-curl https://beta.climb-service.dev/hello
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta.climb-service.dev/hello

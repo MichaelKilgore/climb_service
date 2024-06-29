@@ -4,7 +4,7 @@ use crate::model::climbing_location::ClimbingLocation;
 
 pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> Result<(), Error> {
     // Connect to the database.
-    let (client, connection) = tokio_postgres::connect("host=/cloudsql/climbing-app-426701:us-central1:postgres-instance user=postgres password=postgres dbname=postgres", NoTls).await?;
+    let (client, connection) = tokio_postgres::connect("host=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance user=postgres password=postgres dbname=postgres", NoTls).await?;
     // let (client, connection) = tokio_postgres::connect("host=localhost user=postgres password=postgres dbname=postgres", NoTls).await?;
 
     eprintln!("ONE");

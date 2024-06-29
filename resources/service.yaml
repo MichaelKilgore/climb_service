@@ -1,12 +1,12 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: prod-cloud-run
+  name: beta-cloud-run
 spec:
   template:
     metadata:
       annotations:
-        run.googleapis.com/cloudsql-instances: 'climbing-app-426701:us-central1:prod-postgres-instance' 
+        run.googleapis.com/cloudsql-instances: 'climbing-app-426701:us-central1:postgres-instance' 
     spec:
       containers:
       - image: gcr.io/climbing-app-426701/my-rust-app

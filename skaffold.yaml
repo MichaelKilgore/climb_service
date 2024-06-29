@@ -14,23 +14,9 @@ build:
 
 manifests:
   rawYaml:
-    - resources/beta-service.yaml
+    - resources/service.yaml
 
-profiles:
-  - name: beta
-    manifests:
-      rawYaml:
-        - resources/beta-service.yaml
-    deploy:
-      cloudrun:
-        projectid: "climbing-app-426701"
-        region: "us-central1"
-
-  - name: prod
-    manifests:
-      rawYaml:
-        - resources/prod-service.yaml
-    deploy:
-      cloudrun:
-        projectid: "climbing-app-426701"
-        region: "us-central1"
+deploy:
+  cloudrun:
+    projectid: "climbing-app-426701"
+    region: "us-central1"

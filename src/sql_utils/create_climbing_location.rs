@@ -1,11 +1,18 @@
 use actix_web::web::Json;
 use tokio_postgres::{NoTls, Error, SimpleQueryMessage};
 use crate::model::climbing_location::ClimbingLocation;
+use std::env;
 
 pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> Result<(), Error> {
     // Connect to the database.
-    let (client, connection) = tokio_postgres::connect("host=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance user=postgres password=postgres dbname=postgres", NoTls).await?;
-    // let (client, connection) = tokio_postgres::connect("host=localhost user=postgres password=postgres dbname=postgres", NoTls).await?;
+    let host = env::var("SQL_CONNECTION_NAME").unwrap();
+    let user = env::var("DB_USER").unwrap();
+    let password = env::var("DB_PASSWORD").unwrap();
+    let db_name = env::var("DB_NAME").unwrap();
+
+    let config = format!("host=/cloudsql/{host} user={user} password={password} dbname={db_name}");
+
+    let (client, connection) = tokio_postgres::connect(&*config, NoTls).await?;
 
     eprintln!("ONE");
 

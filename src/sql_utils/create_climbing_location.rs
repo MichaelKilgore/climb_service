@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use tokio_postgres::{NoTls, Error, SimpleQueryMessage};
+use tokio_postgres::{NoTls, Error};
 use crate::model::climbing_location::ClimbingLocation;
 use std::env;
 
@@ -11,12 +11,8 @@ pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> Resul
     let db_name = env::var("DB_NAME").unwrap();
 
     let config = format!("host={host} user={user} password={password} dbname={db_name}");
-    
-    eprintln!("{}", config);
 
     let (client, connection) = tokio_postgres::connect(&*config, NoTls).await?;
-
-    eprintln!("ONE");
 
     // The connection object performs the actual communication with the database,
     // so spawn it off to run on its own.
@@ -26,45 +22,10 @@ pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> Resul
         }
     });
 
-    eprintln!("TWO");
+    let query_string = format!("INSERT INTO climbing_location(name, profile_pic_location, description, address)
+                                       VALUES ('{0}', '{1}', '{2}', '{3}');", location.name, location.profile_pic_location, location.description, location.address);
 
-    // Now we can execute a simple statement that just returns its parameter.
-    let messages = client
-        .simple_query(
-            "CREATE TEMPORARY TABLE foo (
-                id SERIAL,
-                name TEXT
-            );
-            INSERT INTO foo (name) VALUES ('hello'), ('world');
-            SELECT * FROM climbing_location ORDER BY id",
-        )
-        .await
-        .unwrap();
-
-    eprintln!("THREE");
-
-    let mut word = "";
-
-    match messages[0] {
-        SimpleQueryMessage::CommandComplete(0) => {}
-        _ => panic!("unexpected message"),
-    }
-    match messages[1] {
-        SimpleQueryMessage::CommandComplete(2) => {}
-        _ => panic!("unexpected message"),
-    }
-    match &messages[2] {
-        SimpleQueryMessage::Row(row) => {
-            println!("{}", row.get(1).unwrap());
-            word = row.get(1).unwrap();
-        }
-        _ => panic!("unexpected message"),
-    }
-
-    println!(
-        "Received: word={}",
-        word
-    );
+    client.query(&query_string, &[]).await.unwrap();
 
     Ok(())
 }

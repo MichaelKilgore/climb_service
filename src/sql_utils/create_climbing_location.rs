@@ -10,7 +10,9 @@ pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> Resul
     let password = env::var("DB_PASSWORD").unwrap();
     let db_name = env::var("DB_NAME").unwrap();
 
-    let config = format!("host=/cloudsql/{host} user={user} password={password} dbname={db_name}");
+    let config = format!("host={host} user={user} password={password} dbname={db_name}");
+    
+    eprintln!("{}", config);
 
     let (client, connection) = tokio_postgres::connect(&*config, NoTls).await?;
 

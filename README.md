@@ -10,6 +10,8 @@ You can also run the server locally and test that way as well.
 
 ### create-climbing-location
 
+./cloud-sql-proxy --port 5432 climbing-app-426701:us-central1:beta-postgres-instance
+
 curl -X POST \
      -H "Content-Type: application/json" \
      -d @test_payloads/create_climbing_location.json \

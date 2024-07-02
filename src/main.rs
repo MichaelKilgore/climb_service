@@ -11,7 +11,7 @@ use crate::activities::hello_world::hello;
 
 mod activities;
 mod model;
-mod sql_utils;
+mod utils;
 
 #[main]
 async fn main() -> io::Result<()>  {

@@ -15,6 +15,14 @@ steps:
       - push
       - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
 
+  # run unit tests
+  - name: 'rust:latest'
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      cargo test
+
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:

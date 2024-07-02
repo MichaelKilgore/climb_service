@@ -36,7 +36,9 @@ steps:
       - |
         set -e # Exit immediately if a command exits with a non-zero status
         SERVICE_URL=$(gcloud run services describe integ-cloud-run --region us-central1 --format 'value(status.url)')
+        echo "Service URL is: $SERVICE_URL"
         ID_TOKEN=$(gcloud auth print-identity-token)
+        echo "ID Token is: $ID_TOKEN"
         cargo test
 
   - name: 'gcr.io/cloud-builders/gcloud'

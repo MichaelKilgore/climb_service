@@ -18,3 +18,4 @@ async-trait = "0.1"
 [dev-dependencies]
 mockall = "0.12.1"
 thiserror = "1.0"
+curl = "0.4.46"

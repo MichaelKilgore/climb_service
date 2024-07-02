@@ -15,13 +15,29 @@ steps:
       - push
       - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
 
-  # run unit tests
-  - name: 'rust:latest'
+  - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
-    - '-c'
-    - |
-      cargo test
+      - '-c'
+      - |
+        # Deploy directly to Google Cloud Run
+        gcloud run deploy integ-cloud-run \
+          --image=gcr.io/${_PROJECT_ID}/my-rust-app:latest \
+          --region=${_DEFAULT_REGION} \
+          --platform=managed \
+          --no-allow-unauthenticated \
+          --add-cloudsql-instances=climbing-app-426701:us-central1:beta-postgres-instance \
+          --set-env-vars=DB_USER=postgres,DB_PASSWORD=postgres,DB_NAME=postgres,SQL_CONNECTION_NAME=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+	set -e # Exit immediately if a command exits with a non-zero status
+        SERVICE_URL=$(gcloud run services describe integ-cloud-run --region us-central1 --format 'value(status.url)')
+        ID_TOKEN=$(gcloud auth print-identity-token)
+        cargo test
 
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'

@@ -29,14 +29,27 @@ steps:
           --add-cloudsql-instances=climbing-app-426701:us-central1:beta-postgres-instance \
           --set-env-vars=DB_USER=postgres,DB_PASSWORD=postgres,DB_NAME=postgres,SQL_CONNECTION_NAME=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance
 
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        SERVICE_URL=$(gcloud run services describe integ-cloud-run --region ${_DEFAULT_REGION} --format 'value(status.url)')
+        echo "SERVICE_URL=$SERVICE_URL" > /workspace/service_url.env
+        ID_TOKEN=$(gcloud auth print-identity-token)
+        echo "ID_TOKEN=$ID_TOKEN" > /workspace/id_token.env
+
   - name: 'rust:latest'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         set -e # Exit immediately if a command exits with a non-zero status
-        SERVICE_URL=$(gcloud run services describe integ-cloud-run --region us-central1 --format 'value(status.url)')
-        ID_TOKEN=$(gcloud auth print-identity-token)
+        source /workspace/service_url.env
+        source /workspace/id_token.env
+        echo "Running cargo tests with SERVICE_URL: $SERVICE_URL and ID_TOKEN: $ID_TOKEN"
+        export SERVICE_URL=$SERVICE_URL
+        export ID_TOKEN=$ID_TOKEN
         cargo test
 
   - name: 'gcr.io/cloud-builders/gcloud'

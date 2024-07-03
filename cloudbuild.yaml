@@ -29,7 +29,7 @@ steps:
           --add-cloudsql-instances=climbing-app-426701:us-central1:beta-postgres-instance \
           --set-env-vars=DB_USER=postgres,DB_PASSWORD=postgres,DB_NAME=postgres,SQL_CONNECTION_NAME=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'rustlang/rust:latest'
     entrypoint: 'bash'
     args:
       - '-c'

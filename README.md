@@ -22,8 +22,6 @@ curl -X POST \
 curl http://127.0.0.1:8080/hello
 
 
-
-
 ## Remote Test Commands
 
 ### create-climbing-location
@@ -37,3 +35,11 @@ curl -X POST \
 ### hello
 
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta.climb-service.dev/hello
+
+## Run Integration Tests Locally
+
+1. ./cloud-sql-proxy --port 5432 climbing-app-426701:us-central1:beta-postgres-instance
+
+2. start server in rust rover
+
+3. cargo test

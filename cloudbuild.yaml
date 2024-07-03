@@ -37,7 +37,7 @@ steps:
         echo "export SERVICE_URL=$(gcloud run services describe integ-cloud-run --region ${_DEFAULT_REGION} --format 'value(status.url)')" > /workspace/service_url.env
         echo "export ID_TOKEN=$(gcloud auth print-identity-token)" > /workspace/id_token.env
 
-  - name: 'rust:latest'
+  - name: 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
     entrypoint: 'bash'
     args:
       - '-c'

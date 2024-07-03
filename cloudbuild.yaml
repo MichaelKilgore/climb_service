@@ -1,8 +1,14 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker pull gcr.io/${_PROJECT_ID}/my-rust-app:latest || exit 0']
+
+  - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
+      - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
+      - '--cache-from'
       - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'
       - '--build-arg'
       - '_PROJECT_ID=${_PROJECT_ID}'

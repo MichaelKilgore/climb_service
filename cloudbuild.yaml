@@ -34,8 +34,8 @@ steps:
     args:
       - '-c'
       - |
-        SERVICE_URL=$(gcloud run services describe integ-cloud-run --region ${_DEFAULT_REGION} --format 'value(status.url)')
-        ID_TOKEN=$(gcloud auth print-identity-token)
+        echo "SERVICE_URL=$(gcloud run services describe integ-cloud-run --region ${_DEFAULT_REGION} --format 'value(status.url)')" > /workspace/service_url.env
+        echo "ID_TOKEN=$(gcloud auth print-identity-token)" > /workspace/id_token.env
 
   - name: 'rust:latest'
     entrypoint: 'bash'

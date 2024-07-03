@@ -35,9 +35,7 @@ steps:
       - '-c'
       - |
         SERVICE_URL=$(gcloud run services describe integ-cloud-run --region ${_DEFAULT_REGION} --format 'value(status.url)')
-        echo "SERVICE_URL=$SERVICE_URL" > /workspace/service_url.env
         ID_TOKEN=$(gcloud auth print-identity-token)
-        echo "ID_TOKEN=$ID_TOKEN" > /workspace/id_token.env
 
   - name: 'rust:latest'
     entrypoint: 'bash'
@@ -47,9 +45,6 @@ steps:
         set -e # Exit immediately if a command exits with a non-zero status
         source /workspace/service_url.env
         source /workspace/id_token.env
-        echo "Running cargo tests with SERVICE_URL: $SERVICE_URL and ID_TOKEN: $ID_TOKEN"
-        export SERVICE_URL=$SERVICE_URL
-        export ID_TOKEN=$ID_TOKEN
         cargo test
 
   - name: 'gcr.io/cloud-builders/gcloud'

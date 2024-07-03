@@ -51,7 +51,7 @@ steps:
           --images=climb_service=gcr.io/${_PROJECT_ID}/my-rust-app:latest \
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: REGIONAL_USER_OWNED_BUCKET
 
 images:
   - 'gcr.io/${_PROJECT_ID}/my-rust-app:latest'

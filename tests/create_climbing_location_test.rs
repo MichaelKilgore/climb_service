@@ -13,7 +13,7 @@ fn test_create_climbing_location() {
     let id_token = env::var("ID_TOKEN").unwrap();
     let mut headers = List::new();
     headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
-    //easy.http_headers(headers).unwrap();
+    easy.http_headers(headers).unwrap();
 
     // perform request
     easy.perform().unwrap();

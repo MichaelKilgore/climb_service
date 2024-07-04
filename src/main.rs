@@ -5,6 +5,7 @@ use actix_rt::main;
 use actix_web::App;
 use actix_web::HttpServer;
 use actix_web::middleware;
+use crate::activities::create_climb_user::create_climb_user;
 
 use crate::activities::create_climbing_location::create_climbing_location;
 use crate::activities::hello_world::hello;
@@ -24,6 +25,7 @@ async fn main() -> io::Result<()>  {
             .wrap(middleware::Logger::default())
             // register HTTP requests handlers
             .service(create_climbing_location)
+            .service(create_climb_user)
             .service(hello)
     })
         .bind("0.0.0.0:8080")?

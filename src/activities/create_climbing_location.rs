@@ -2,11 +2,11 @@ use::actix_web::post;
 use::actix_web::HttpResponse;
 use::actix_web::web::Json;
 use crate::model::climbing_location::ClimbingLocation;
-use crate::utils::sql_utils::{SqlUtils, SqlUtilsImpl};
+use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
 
 #[post("/create-climbing-location")]
 pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> HttpResponse {
-    let sql_utils = SqlUtilsImpl;
+    let sql_utils = SqlUtilsImpl { db_config: DbConfig::new() };
 
     return create_climbing_location_impl(&sql_utils, location).await;
 }
@@ -38,7 +38,8 @@ mod tests {
             profile_pic_location: "/images/rocky_peak.png".to_string(),
             description: "A popular climbing spot with diverse routes.".to_string(),
             address: "123 Climbing Lane, Boulder City".to_string(),
-            additional_info: "".to_string()
+            additional_info: "".to_string(),
+            moderator_comments: "".to_string()
         };
 
         pub struct SqlUtilsImplMock;

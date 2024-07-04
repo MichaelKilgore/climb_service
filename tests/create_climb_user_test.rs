@@ -1,8 +1,10 @@
 use std::env;
 use curl::easy::{Easy, List};
+use regex::Regex;
+use serde_json::Value;
 
 #[test]
-fn test_create_climbing_location() {
+fn test_create_climb_user() {
     let mut easy = Easy::new();
 
     // set host
@@ -17,7 +19,7 @@ fn test_create_climbing_location() {
             "http://localhost:8080".to_string()
         }
     };
-    easy.url(&format!("{host}/create-climbing-location")).unwrap();
+    easy.url(&format!("{host}/create-climb-user")).unwrap();
     easy.post(true).unwrap();
 
     // set authentication header
@@ -35,19 +37,26 @@ fn test_create_climbing_location() {
     let mut headers = List::new();
     if !id_token.is_empty() {
         headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
+        easy.http_headers(headers).unwrap();
     }
-    headers.append("Content-Type: application/json").unwrap();
-    easy.http_headers(headers).unwrap();
-    
-    // set json body request
-    let json_data = r#"{"name":"Mount Everest Base Camp","profile_pic_location":"/images/mount-everest.jpg","description":"A popular trekking route in Nepal","address":"Sagarmatha National Park, Nepal","additional_info": "","moderator_comments": ""}"#;
-    easy.post_fields_copy(json_data.as_bytes()).unwrap();
 
     // perform request
     easy.perform().unwrap();
 
-    let response_code = easy.response_code().unwrap();
+    let mut response_body = Vec::new();
+    {
+        let mut transfer = easy.transfer();
+        transfer.write_function(|data| {
+            response_body.extend_from_slice(data);
+            Ok(data.len())
+        }).unwrap();
+        transfer.perform().unwrap();
+    }
 
+    let actual_json: Value = serde_json::from_slice(&response_body).unwrap();
+
+    let response_code = easy.response_code().unwrap();
+    
     // Check if the request was successful
     if response_code == 200 {
         println!("Request was successful!");
@@ -56,4 +65,10 @@ fn test_create_climbing_location() {
     }
 
     assert_eq!(response_code, 200);
+
+    if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
+        let re = Regex::new(r"^bot\d{20}$").unwrap();
+
+        assert_eq!(true, re.is_match(user_name));
+    }
 }

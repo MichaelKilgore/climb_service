@@ -428,6 +428,8 @@ dependencies = [
  "futures",
  "mockall",
  "postgres",
+ "rand",
+ "regex",
  "serde",
  "serde_json",
  "thiserror",

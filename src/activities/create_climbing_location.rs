@@ -26,12 +26,9 @@ async fn create_climbing_location_impl<S>(sql_utils: &S, location: Json<Climbing
 
 #[cfg(test)]
 mod tests {
-    use crate::model::climbing_location::ClimbingLocation;
-    use::actix_web::web::Json;
+    use super::*;
     use actix_web::body::to_bytes;
     use async_trait::async_trait;
-    use crate::utils::sql_utils::SqlUtils;
-    use crate::activities::create_climbing_location::create_climbing_location_impl;
     use tokio_postgres::Error;
 
     #[actix_web::test]

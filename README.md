@@ -43,3 +43,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta
 2. start server in rust rover
 
 3. cargo test
+
+##  Connecting to sql instance:
+
+1. gcloud beta sql connect  beta-postgres-instance

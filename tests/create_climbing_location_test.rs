@@ -40,7 +40,7 @@ fn test_create_climbing_location() {
     easy.http_headers(headers).unwrap();
     
     // set json body request
-    let json_data = r#"{"name":"Mount Everest Base Camp","profile_pic_location":"/images/mount-everest.jpg","description":"A popular trekking route in Nepal","address":"Sagarmatha National Park, Nepal"}"#;
+    let json_data = r#"{"name":"Mount Everest Base Camp","profile_pic_location":"/images/mount-everest.jpg","description":"A popular trekking route in Nepal","address":"Sagarmatha National Park, Nepal","additional_info": ""}"#;
     easy.post_fields_copy(json_data.as_bytes()).unwrap();
 
     // perform request

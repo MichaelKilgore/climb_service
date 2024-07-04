@@ -38,6 +38,7 @@ mod tests {
             profile_pic_location: "/images/rocky_peak.png".to_string(),
             description: "A popular climbing spot with diverse routes.".to_string(),
             address: "123 Climbing Lane, Boulder City".to_string(),
+            additional_info: "".to_string()
         };
 
         pub struct SqlUtilsImplMock;

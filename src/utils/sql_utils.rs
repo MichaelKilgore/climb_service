@@ -32,8 +32,9 @@ impl SqlUtils for SqlUtilsImpl {
             }
         });
 
-        let query_string = format!("INSERT INTO climbing_location(name, profile_pic_location, description, address)
-                                       VALUES ('{0}', '{1}', '{2}', '{3}') RETURNING id;", location.name, location.profile_pic_location, location.description, location.address);
+        let query_string = format!("INSERT INTO climbing_location(name, profile_pic_location, description, address, status, additional_info, moderator_comments)
+                                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}') RETURNING id;", location.name, 
+                                   location.profile_pic_location, location.description, location.address, "IN REVIEW", location.additional_info, "");
 
         let row = client.query_one(&query_string, &[]).await.unwrap();
         let id: i32 = row.get("id");

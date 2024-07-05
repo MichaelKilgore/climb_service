@@ -33,7 +33,7 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
     };
 
     return match sql_utils.create_climb_user(user).await {
-        Ok(_) => HttpResponse::Ok().json(serde_json::json!({ "user_name": user_name })),
+        Ok(..) => HttpResponse::Ok().json(serde_json::json!({ "user_name": user_name })),
         Err(err) => {
             if err == SqlError::PrimaryKeyAlreadyExists {
                 return HttpResponse::Conflict().json("Insertion failed: user_name already exists");
@@ -58,8 +58,8 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<u64, SqlError> {
-                Ok(0)
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+                Ok(())
             }
         }
 

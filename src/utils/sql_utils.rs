@@ -13,8 +13,8 @@ pub trait SqlUtils: Send + Sync {
     async fn create_climbing_location(&self, _location: Json<ClimbingLocation>) -> Result<i32, Error> {
         Ok(0)
     }
-    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<u64, SqlError> {
-        Ok(0)
+    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+        Ok(())
     }
 }
 
@@ -74,7 +74,7 @@ impl SqlUtils for SqlUtilsImpl {
         Ok(id)
     }
 
-    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<u64, SqlError> {
+    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<(), SqlError> {
         let config = self.db_config.get_config_string();
 
         let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
@@ -94,7 +94,7 @@ impl SqlUtils for SqlUtilsImpl {
                                        VALUES ('{0}', '{1}', '{2}');", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
         
         return match client.execute(&insert_string, &[]).await {
-            Ok(res) => Ok(res),
+            Ok(_) => Ok(()),
             Err(err) => {
                 if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
                     return Err(SqlError::PrimaryKeyAlreadyExists);

@@ -1,9 +1,11 @@
 use actix_web::web::Json;
 use tokio_postgres::{NoTls, Error};
+use crate::errors::sql_error::SqlError;
 use crate::model::climbing_location::ClimbingLocation;
 use crate::model::climb_user::ClimbUser;
 use std::env;
 use async_trait::async_trait;
+use tokio_postgres::error::SqlState;
 
 #[async_trait]
 pub trait SqlUtils: Send + Sync {
@@ -11,8 +13,8 @@ pub trait SqlUtils: Send + Sync {
     async fn create_climbing_location(&self, _location: Json<ClimbingLocation>) -> Result<i32, Error> {
         Ok(0)
     }
-    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), Error> {
-        Ok(())
+    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<u64, SqlError> {
+        Ok(0)
     }
 }
 
@@ -72,10 +74,13 @@ impl SqlUtils for SqlUtilsImpl {
         Ok(id)
     }
 
-    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<(), Error> {
+    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<u64, SqlError> {
         let config = self.db_config.get_config_string();
 
-        let (client, connection) = tokio_postgres::connect(&*config, NoTls).await?;
+        let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
+            Ok((client, connection)) => (client, connection),
+            Err(err) => return Err(SqlError::ConnectionError(err.to_string())),
+        };
 
         // The connection object performs the actual communication with the database,
         // so spawn it off to run on its own.
@@ -84,12 +89,18 @@ impl SqlUtils for SqlUtilsImpl {
                 eprintln!("connection error: {}", e);
             }
         });
-
-        let query_string = format!("INSERT INTO climb_user(user_name, phone_number, status, moderator_comments)
-                                       VALUES ('{0}', '{1}', '{2}', '{3}');", climb_user.user_name, climb_user.phone_number, climb_user.status, climb_user.moderator_comments);
         
-        let _ = client.query_one(&query_string, &[]).await;
-
-        Ok(())
+        let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
+                                       VALUES ('{0}', '{1}', '{2}');", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
+        
+        return match client.execute(&insert_string, &[]).await {
+            Ok(res) => Ok(res),
+            Err(err) => {
+                if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
+                    return Err(SqlError::PrimaryKeyAlreadyExists);
+                }
+                return Err(SqlError::UnknownError);
+            }
+        }
     }
 }

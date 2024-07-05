@@ -36,6 +36,10 @@ curl -X POST \
 
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta.climb-service.dev/hello
 
+### create-climb-user
+
+curl -X POST -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta.climb-service.dev/create-climb-user
+
 ## Run Integration Tests Locally
 
 1. ./cloud-sql-proxy --port 5432 climbing-app-426701:us-central1:beta-postgres-instance

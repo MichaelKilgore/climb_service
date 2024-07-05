@@ -13,6 +13,7 @@ use crate::activities::hello_world::hello;
 mod activities;
 mod model;
 mod utils;
+mod errors;
 
 #[main]
 async fn main() -> io::Result<()>  {

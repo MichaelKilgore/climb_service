@@ -3,6 +3,7 @@ use::actix_web::HttpResponse;
 use crate::model::climb_user::ClimbUser;
 use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
 use rand::Rng;
+use crate::errors::sql_error::SqlError;
 
 #[post("/create-climb-user")]
 pub async fn create_climb_user() -> HttpResponse {
@@ -32,9 +33,11 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
     };
 
     return match sql_utils.create_climb_user(user).await {
-        Ok(()) => HttpResponse::Ok().json(serde_json::json!({ "user_name": user_name })),
+        Ok(_) => HttpResponse::Ok().json(serde_json::json!({ "user_name": user_name })),
         Err(err) => {
-            println!("Error: {}", err);
+            if err == SqlError::PrimaryKeyAlreadyExists {
+                return HttpResponse::Conflict().json("Insertion failed: user_name already exists");
+            }
             return HttpResponse::InternalServerError().body("Failed to create climb user");
         }
     }
@@ -45,7 +48,6 @@ mod tests {
     use super::*;
     use actix_web::body::to_bytes;
     use async_trait::async_trait;
-    use tokio_postgres::Error;
     use serde_json::Value;
     use regex::Regex;
 
@@ -56,8 +58,8 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), Error> {
-                Ok(())
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<u64, SqlError> {
+                Ok(0)
             }
         }
 
@@ -73,7 +75,7 @@ mod tests {
 
         if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
             let re = Regex::new(r"^bot\d{20}$").unwrap();
-            
+
             assert_eq!(true, re.is_match(user_name));
         }
     }

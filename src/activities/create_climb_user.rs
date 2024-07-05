@@ -80,5 +80,58 @@ mod tests {
         }
     }
 
+    #[actix_web::test]
+    async fn test_create_climb_user_impl_failure_user_name_already_exists_test() {
+        pub struct SqlUtilsImplMock;
+
+        #[async_trait]
+        impl SqlUtils for SqlUtilsImplMock {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+                Err(SqlError::PrimaryKeyAlreadyExists)
+            }
+        }
+
+        let sql_utils = SqlUtilsImplMock;
+
+        let resp = crate::activities::create_climb_user::create_climb_user_impl(&sql_utils).await;
+
+        assert_eq!(resp.status(), actix_web::http::StatusCode::CONFLICT);
+    }
+
+    #[actix_web::test]
+    async fn test_create_climb_user_impl_failure_unknown_error_test() {
+        pub struct SqlUtilsImplMock;
+
+        #[async_trait]
+        impl SqlUtils for SqlUtilsImplMock {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+                Err(SqlError::UnknownError)
+            }
+        }
+
+        let sql_utils = SqlUtilsImplMock;
+
+        let resp = crate::activities::create_climb_user::create_climb_user_impl(&sql_utils).await;
+
+        assert_eq!(resp.status(), actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    #[actix_web::test]
+    async fn test_create_climb_user_impl_fail_to_connect_to_db_test() {
+        pub struct SqlUtilsImplMock;
+
+        #[async_trait]
+        impl SqlUtils for SqlUtilsImplMock {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+                Err(SqlError::ConnectionError("Connection error.".to_string()))
+            }
+        }
+
+        let sql_utils = SqlUtilsImplMock;
+
+        let resp = crate::activities::create_climb_user::create_climb_user_impl(&sql_utils).await;
+
+        assert_eq!(resp.status(), actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
 

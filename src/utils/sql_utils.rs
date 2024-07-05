@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use tokio_postgres::{NoTls, Error};
+use tokio_postgres::NoTls;
 use crate::errors::sql_error::SqlError;
 use crate::model::climbing_location::ClimbingLocation;
 use crate::model::climb_user::ClimbUser;
@@ -10,7 +10,7 @@ use tokio_postgres::error::SqlState;
 #[async_trait]
 pub trait SqlUtils: Send + Sync {
 
-    async fn create_climbing_location(&self, _location: Json<ClimbingLocation>) -> Result<i32, Error> {
+    async fn create_climbing_location(&self, _location: Json<ClimbingLocation>) -> Result<i32, SqlError> {
         Ok(0)
     }
     async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
@@ -44,17 +44,20 @@ impl DbConfig {
     }
 }
 
-pub struct SqlUtilsImpl { 
+pub struct SqlUtilsImpl {
     pub(crate) db_config: DbConfig
 }
 
 #[async_trait]
 impl SqlUtils for SqlUtilsImpl {
-    
-    async fn create_climbing_location(&self, location: Json<ClimbingLocation>) -> Result<i32, Error> {
+
+    async fn create_climbing_location(&self, location: Json<ClimbingLocation>) -> Result<i32, SqlError> {
         let config = self.db_config.get_config_string();
 
-        let (client, connection) = tokio_postgres::connect(&*config, NoTls).await?;
+        let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
+            Ok((client, connection)) => (client, connection),
+            Err(err) => return Err(SqlError::ConnectionError(err.to_string())),
+        };
 
         // The connection object performs the actual communication with the database,
         // so spawn it off to run on its own.
@@ -71,7 +74,12 @@ impl SqlUtils for SqlUtilsImpl {
         let row = client.query_one(&query_string, &[]).await.unwrap();
         let id: i32 = row.get("id");
 
-        Ok(id)
+        return match client.execute(&query_string, &[]).await {
+            Ok(_) => Ok(id),
+            Err(..) => {
+                return Err(SqlError::UnknownError);
+            }
+        }
     }
 
     async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<(), SqlError> {
@@ -89,10 +97,10 @@ impl SqlUtils for SqlUtilsImpl {
                 eprintln!("connection error: {}", e);
             }
         });
-        
+
         let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
                                        VALUES ('{0}', '{1}', '{2}');", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
-        
+
         return match client.execute(&insert_string, &[]).await {
             Ok(_) => Ok(()),
             Err(err) => {

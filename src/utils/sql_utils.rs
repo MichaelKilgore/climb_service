@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use tokio_postgres::NoTls;
+use tokio_postgres::{Client, NoTls};
 use crate::errors::sql_error::SqlError;
 use crate::model::climbing_location::ClimbingLocation;
 use crate::model::climb_user::ClimbUser;
@@ -52,20 +52,7 @@ pub struct SqlUtilsImpl {
 impl SqlUtils for SqlUtilsImpl {
 
     async fn create_climbing_location(&self, location: Json<ClimbingLocation>) -> Result<i32, SqlError> {
-        let config = self.db_config.get_config_string();
-
-        let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
-            Ok((client, connection)) => (client, connection),
-            Err(err) => return Err(SqlError::ConnectionError(err.to_string())),
-        };
-
-        // The connection object performs the actual communication with the database,
-        // so spawn it off to run on its own.
-        tokio::spawn(async move {
-            if let Err(e) = connection.await {
-                eprintln!("connection error: {}", e);
-            }
-        });
+        let client = self.connect_and_spawn().await.unwrap();
 
         let query_string = format!("INSERT INTO climbing_location(name, profile_pic_location, description, address, status, additional_info, moderator_comments)
                                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}') RETURNING id;", location.name,
@@ -83,20 +70,7 @@ impl SqlUtils for SqlUtilsImpl {
     }
 
     async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<(), SqlError> {
-        let config = self.db_config.get_config_string();
-
-        let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
-            Ok((client, connection)) => (client, connection),
-            Err(err) => return Err(SqlError::ConnectionError(err.to_string())),
-        };
-
-        // The connection object performs the actual communication with the database,
-        // so spawn it off to run on its own.
-        tokio::spawn(async move {
-            if let Err(e) = connection.await {
-                eprintln!("connection error: {}", e);
-            }
-        });
+        let client = self.connect_and_spawn().await.unwrap();
 
         let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
                                        VALUES ('{0}', '{1}', '{2}');", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
@@ -111,4 +85,25 @@ impl SqlUtils for SqlUtilsImpl {
             }
         }
     }
+}
+
+impl SqlUtilsImpl {
+   async fn connect_and_spawn(&self) -> Result<Client, SqlError> {
+       let config = self.db_config.get_config_string();
+
+       let (client, connection) = match tokio_postgres::connect(&*config, NoTls).await {
+           Ok((client, connection)) => (client, connection),
+           Err(err) => return Err(SqlError::ConnectionError(err.to_string())),
+       };
+
+       // The connection object performs the actual communication with the database,
+       // so spawn it off to run on its own.
+       tokio::spawn(async move {
+           if let Err(e) = connection.await {
+               eprintln!("connection error: {}", e);
+           }
+       });
+       
+       return Ok(client);
+   }
 }

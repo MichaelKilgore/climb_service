@@ -16,6 +16,10 @@ pub trait SqlUtils: Send + Sync {
     async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
         Ok(())
     }
+
+    async fn update_climb_user_user_name(&self, user_name: String, new_user_name: String) -> Result<(), SqlError> {
+        Ok(())
+    }
 }
 
 #[derive(Clone)]
@@ -85,6 +89,24 @@ impl SqlUtils for SqlUtilsImpl {
             }
         }
     }
+
+    async fn update_climb_user_user_name(&self, user_name: String, new_user_name: String) -> Result<(), SqlError> {
+        let client = self.connect_and_spawn().await.unwrap();
+
+        let query = format!("UPDATE climb_user
+                                    SET user_name = '{0}'
+                                    WHERE user_name = '{1}'", new_user_name, user_name);
+        
+        return match client.execute(&query, &[]).await {
+            Ok(_) => Ok(()),
+            Err(err) => {
+                if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
+                    return Err(SqlError::PrimaryKeyAlreadyExists);
+                }
+                return Err(SqlError::UnknownError);
+            }
+        }
+    }
 }
 
 impl SqlUtilsImpl {
@@ -103,7 +125,7 @@ impl SqlUtilsImpl {
                eprintln!("connection error: {}", e);
            }
        });
-       
+
        return Ok(client);
    }
 }

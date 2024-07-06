@@ -23,7 +23,7 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
 
     let random_number = rng.gen_range(min..=max);
 
-    let user_name = format!("bot{}", random_number);
+    let user_name = format!("user{}", random_number);
 
     let user = ClimbUser {
         user_name: user_name.clone(),
@@ -74,7 +74,7 @@ mod tests {
         let actual_json: serde_json::Value = serde_json::from_slice(&resp_body).unwrap();
 
         if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
-            let re = Regex::new(r"^bot\d{20}$").unwrap();
+            let re = Regex::new(r"^user\d{20}$").unwrap();
 
             assert_eq!(true, re.is_match(user_name));
         }

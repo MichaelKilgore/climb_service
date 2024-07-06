@@ -9,6 +9,7 @@ use crate::activities::create_climb_user::create_climb_user;
 
 use crate::activities::create_climbing_location::create_climbing_location;
 use crate::activities::hello_world::hello;
+use crate::activities::update_climb_user_user_name::update_climb_user_user_name;
 
 mod activities;
 mod model;
@@ -27,6 +28,7 @@ async fn main() -> io::Result<()>  {
             // register HTTP requests handlers
             .service(create_climbing_location)
             .service(create_climb_user)
+            .service(update_climb_user_user_name)
             .service(hello)
     })
         .bind("0.0.0.0:8080")?

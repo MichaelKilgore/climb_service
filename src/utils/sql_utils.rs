@@ -13,11 +13,11 @@ pub trait SqlUtils: Send + Sync {
     async fn create_climbing_location(&self, _location: Json<ClimbingLocation>) -> Result<i32, SqlError> {
         Ok(0)
     }
-    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
-        Ok(())
+    async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
+        Ok(0)
     }
 
-    async fn update_climb_user_user_name(&self, user_name: String, new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, _user_id: String, _new_user_name: String) -> Result<(), SqlError> {
         Ok(())
     }
 }
@@ -73,14 +73,14 @@ impl SqlUtils for SqlUtilsImpl {
         }
     }
 
-    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<(), SqlError> {
+    async fn create_climb_user(&self, climb_user: ClimbUser) -> Result<i32, SqlError> {
         let client = self.connect_and_spawn().await.unwrap();
 
         let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
-                                       VALUES ('{0}', '{1}', '{2}');", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
-
-        return match client.execute(&insert_string, &[]).await {
-            Ok(_) => Ok(()),
+                                       VALUES ('{0}', '{1}', '{2}') RETURNING id;", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
+        
+        return match client.query_one(&insert_string, &[]).await {
+            Ok(row) => Ok(row.get("id")),
             Err(err) => {
                 if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
                     return Err(SqlError::PrimaryKeyAlreadyExists);
@@ -90,12 +90,12 @@ impl SqlUtils for SqlUtilsImpl {
         }
     }
 
-    async fn update_climb_user_user_name(&self, user_name: String, new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, user_id: String, new_user_name: String) -> Result<(), SqlError> {
         let client = self.connect_and_spawn().await.unwrap();
 
         let query = format!("UPDATE climb_user
                                     SET user_name = '{0}'
-                                    WHERE user_name = '{1}'", new_user_name, user_name);
+                                    WHERE user_id = '{1}'", new_user_name, user_id);
         
         return match client.execute(&query, &[]).await {
             Ok(_) => Ok(()),

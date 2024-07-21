@@ -73,93 +73,99 @@ fn test_create_climb_user() {
     assert_eq!(response_code, 200);
 
     if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
-        let re = Regex::new(r"^user\d{20}$").unwrap();
+        if let Some(user_id) = actual_json.get("id").and_then(Value::as_str) {
+            let re = Regex::new(r"^\d").unwrap();
 
-        assert_eq!(true, re.is_match(user_name));
+            assert_eq!(true, re.is_match(user_id));
 
-        let mut easy = Easy::new();
+            let re = Regex::new(r"^user\d{20}$").unwrap();
 
-        // set host
-        let host = match env::var("SERVICE_URL") {
-            Ok(value) => {
-                value
-            }
-            Err(env::VarError::NotPresent) => {
-                "http://localhost:8080".to_string()
-            }
-            Err(env::VarError::NotUnicode(_)) => {
-                "http://localhost:8080".to_string()
-            }
-        };
-        easy.url(&format!("{host}/update-climb-user-user-name")).unwrap();
-        easy.post(true).unwrap();
+            assert_eq!(true, re.is_match(user_name));
 
-        // set authentication header
-        let id_token = match env::var("ID_TOKEN") {
-            Ok(value) => {
-                value
+            let mut easy = Easy::new();
+
+            // set host
+            let host = match env::var("SERVICE_URL") {
+                Ok(value) => {
+                    value
+                }
+                Err(env::VarError::NotPresent) => {
+                    "http://localhost:8080".to_string()
+                }
+                Err(env::VarError::NotUnicode(_)) => {
+                    "http://localhost:8080".to_string()
+                }
+            };
+            easy.url(&format!("{host}/update-climb-user-user-name")).unwrap();
+            easy.post(true).unwrap();
+
+            // set authentication header
+            let id_token = match env::var("ID_TOKEN") {
+                Ok(value) => {
+                    value
+                }
+                Err(env::VarError::NotPresent) => {
+                    "".to_string()
+                }
+                Err(env::VarError::NotUnicode(_)) => {
+                    "".to_string()
+                }
+            };
+            let mut headers = List::new();
+            if !id_token.is_empty() {
+                headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
             }
-            Err(env::VarError::NotPresent) => {
-                "".to_string()
+            headers.append("Content-Type: application/json").unwrap();
+            easy.http_headers(headers).unwrap();
+
+            // set json body request
+            #[derive(Serialize)]
+            struct UserNameUpdate {
+                user_id: String,
+                new_user_name: String,
             }
-            Err(env::VarError::NotUnicode(_)) => {
-                "".to_string()
+
+            let update = UserNameUpdate {
+                user_id: user_id.parse().unwrap(),
+                new_user_name: "poopyjr".to_string(),
+            };
+
+            let json_data = serde_json::to_string(&update).unwrap();
+            easy.post_fields_copy(json_data.as_bytes()).unwrap();
+
+            // perform request
+            easy.perform().unwrap();
+
+            let response_code = easy.response_code().unwrap();
+
+            // Check if the request was successful
+            if response_code == 200 {
+                println!("Request was successful!");
+            } else {
+                println!("Request failed!");
             }
-        };
-        let mut headers = List::new();
-        if !id_token.is_empty() {
-            headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
+
+            assert_eq!(response_code, 200);
+
+
+            let update_back = UserNameUpdate {
+                user_id: user_id.parse().unwrap(),
+                new_user_name: user_name.parse().unwrap(),
+            };
+            let json_data = serde_json::to_string(&update_back).unwrap();
+            easy.post_fields_copy(json_data.as_bytes()).unwrap();
+
+            easy.perform().unwrap();
+            let response_code = easy.response_code().unwrap();
+
+            // Check if the request was successful
+            if response_code == 200 {
+                println!("Request was successful!");
+            } else {
+                println!("Request failed!");
+            }
+
+            assert_eq!(response_code, 200);
         }
-        headers.append("Content-Type: application/json").unwrap();
-        easy.http_headers(headers).unwrap();
-
-        // set json body request
-        #[derive(Serialize)]
-        struct UserNameUpdate {
-            user_name: String,
-            new_user_name: String,
-        }
-
-        let update = UserNameUpdate {
-            user_name: user_name.parse().unwrap(),
-            new_user_name: "poopyjr".to_string(),
-        };
-
-        let json_data = serde_json::to_string(&update).unwrap();
-        easy.post_fields_copy(json_data.as_bytes()).unwrap();
-
-        // perform request
-        easy.perform().unwrap();
-
-        let response_code = easy.response_code().unwrap();
-
-        // Check if the request was successful
-        if response_code == 200 {
-            println!("Request was successful!");
-        } else {
-            println!("Request failed!");
-        }
-
-        assert_eq!(response_code, 200);
-
-
-        let update_back = UserNameUpdate {
-            user_name: "poopyjr".to_string(),
-            new_user_name: user_name.parse().unwrap(),
-        };
-        let json_data = serde_json::to_string(&update_back).unwrap();
-        easy.post_fields_copy(json_data.as_bytes()).unwrap();
-
-        easy.perform().unwrap();
-        let response_code = easy.response_code().unwrap();
-
-        // Check if the request was successful
-        if response_code == 200 {
-            println!("Request was successful!");
-        } else {
-            println!("Request failed!");
-        }
-
-        assert_eq!(response_code, 200);
     }
 }

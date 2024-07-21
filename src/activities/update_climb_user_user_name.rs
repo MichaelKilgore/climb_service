@@ -1,9 +1,7 @@
 use::actix_web::post;
 use::actix_web::HttpResponse;
 use actix_web::web::Json;
-use crate::model::climb_user::ClimbUser;
 use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
-use rand::Rng;
 use crate::errors::sql_error::SqlError;
 use crate::model::update_climb_user_user_name::UpdateClimbUserUserName;
 
@@ -18,7 +16,7 @@ async fn update_climb_user_user_name_impl<S>(sql_utils: &S, body: Json<UpdateCli
     where
         S: SqlUtils
 {
-    return match sql_utils.update_climb_user_user_name(body.user_name.clone(), body.new_user_name.clone()).await {
+    return match sql_utils.update_climb_user_user_name(body.user_id.clone(), body.new_user_name.clone()).await {
         Ok(..) => HttpResponse::Ok().json("{}"),
         Err(err) => {
             if err == SqlError::PrimaryKeyAlreadyExists {
@@ -32,6 +30,7 @@ async fn update_climb_user_user_name_impl<S>(sql_utils: &S, body: Json<UpdateCli
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::model::climb_user::ClimbUser;
     use async_trait::async_trait;
 
     #[actix_web::test]
@@ -41,13 +40,13 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
-                Ok(())
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
+                Ok(0)
             }
         }
 
         let body = UpdateClimbUserUserName {
-            user_name: "michael".to_string(),
+            user_id: "1".to_string(),
             new_user_name: "bill".to_string()
         };
 

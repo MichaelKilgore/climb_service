@@ -71,4 +71,10 @@ fn test_create_climb_user() {
 
         assert_eq!(true, re.is_match(user_name));
     }
+
+    if let Some(user_id) = actual_json.get("id").and_then(Value::as_str) {
+        let re = Regex::new(r"^\d").unwrap();
+
+        assert_eq!(true, re.is_match(user_id));
+    }
 }

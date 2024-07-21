@@ -32,8 +32,9 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
         moderator_comments: "".to_string()
     };
 
+    let user_name_clone = user_name.clone();
     return match sql_utils.create_climb_user(user).await {
-        Ok(..) => HttpResponse::Ok().json(serde_json::json!({ "user_name": user_name })),
+        Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "id": id, "user_name": user_name_clone })),
         Err(err) => {
             if err == SqlError::PrimaryKeyAlreadyExists {
                 return HttpResponse::Conflict().json("Insertion failed: user_name already exists");
@@ -58,8 +59,8 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
-                Ok(())
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
+                Ok(0)
             }
         }
 
@@ -86,7 +87,7 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
                 Err(SqlError::PrimaryKeyAlreadyExists)
             }
         }
@@ -104,7 +105,7 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
                 Err(SqlError::UnknownError)
             }
         }
@@ -122,7 +123,7 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<(), SqlError> {
+            async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
                 Err(SqlError::ConnectionError("Connection error.".to_string()))
             }
         }

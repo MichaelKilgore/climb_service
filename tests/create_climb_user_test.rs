@@ -70,11 +70,15 @@ fn test_create_climb_user() {
         let re = Regex::new(r"^user\d{20}$").unwrap();
 
         assert_eq!(true, re.is_match(user_name));
+    } else {
+        panic!("Failed to get user_name from json response");
     }
 
-    if let Some(user_id) = actual_json.get("id").and_then(Value::as_str) {
+    if let Some(user_id) = actual_json.get("id").and_then(Value::as_i64) {
         let re = Regex::new(r"^\d").unwrap();
 
-        assert_eq!(true, re.is_match(user_id));
+        assert_eq!(true, re.is_match(&*user_id.to_string()));
+    } else {
+        panic!("Failed to get id from json response");
     }
 }

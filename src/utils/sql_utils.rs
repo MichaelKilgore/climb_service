@@ -17,7 +17,7 @@ pub trait SqlUtils: Send + Sync {
         Ok(0)
     }
 
-    async fn update_climb_user_user_name(&self, _user_id: String, _new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, _user_id: i32, _new_user_name: String) -> Result<(), SqlError> {
         Ok(())
     }
 }
@@ -78,7 +78,7 @@ impl SqlUtils for SqlUtilsImpl {
 
         let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
                                        VALUES ('{0}', '{1}', '{2}') RETURNING id;", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
-        
+
         return match client.query_one(&insert_string, &[]).await {
             Ok(row) => Ok(row.get("id")),
             Err(err) => {
@@ -90,12 +90,12 @@ impl SqlUtils for SqlUtilsImpl {
         }
     }
 
-    async fn update_climb_user_user_name(&self, user_id: String, new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, user_id: i32, new_user_name: String) -> Result<(), SqlError> {
         let client = self.connect_and_spawn().await.unwrap();
 
         let query = format!("UPDATE climb_user
                                     SET user_name = '{0}'
-                                    WHERE user_id = '{1}'", new_user_name, user_id);
+                                    WHERE id = '{1}'", new_user_name, user_id);
         
         return match client.execute(&query, &[]).await {
             Ok(_) => Ok(()),

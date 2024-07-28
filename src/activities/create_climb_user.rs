@@ -34,7 +34,7 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
 
     let user_name_clone = user_name.clone();
     return match sql_utils.create_climb_user(user).await {
-        Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "id": id, "user_name": user_name_clone })),
+        Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "climb_user_id": id, "user_name": user_name_clone })),
         Err(err) => {
             if err == SqlError::PrimaryKeyAlreadyExists {
                 return HttpResponse::Conflict().json("Insertion failed: user_name already exists");

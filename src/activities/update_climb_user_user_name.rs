@@ -16,7 +16,7 @@ async fn update_climb_user_user_name_impl<S>(sql_utils: &S, body: Json<UpdateCli
     where
         S: SqlUtils
 {
-    return match sql_utils.update_climb_user_user_name(body.user_id, body.new_user_name.clone()).await {
+    return match sql_utils.update_climb_user_user_name(body.climb_user_id, body.new_user_name.clone()).await {
         Ok(..) => HttpResponse::Ok().json("{}"),
         Err(err) => {
             if err == SqlError::PrimaryKeyAlreadyExists {
@@ -46,7 +46,7 @@ mod tests {
         }
 
         let body = UpdateClimbUserUserName {
-            user_id: 1,
+            climb_user_id: 1,
             new_user_name: "bill".to_string()
         };
 

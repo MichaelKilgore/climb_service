@@ -74,7 +74,7 @@ fn test_create_climb_user() {
         panic!("Failed to get user_name from json response");
     }
 
-    if let Some(user_id) = actual_json.get("id").and_then(Value::as_i64) {
+    if let Some(user_id) = actual_json.get("climb_user_id").and_then(Value::as_i64) {
         let re = Regex::new(r"^\d").unwrap();
 
         assert_eq!(true, re.is_match(&*user_id.to_string()));

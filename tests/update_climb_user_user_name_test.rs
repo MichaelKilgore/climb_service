@@ -73,7 +73,7 @@ fn test_update_climb_user_user_name() {
     assert_eq!(response_code, 200);
 
     if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
-        if let Some(user_id) = actual_json.get("id").and_then(Value::as_i64) {
+        if let Some(user_id) = actual_json.get("climb_user_id").and_then(Value::as_i64) {
 
             let re = Regex::new(r"^user\d{20}$").unwrap();
 
@@ -118,12 +118,12 @@ fn test_update_climb_user_user_name() {
             // set json body request
             #[derive(Serialize)]
             struct UserNameUpdate {
-                user_id: i32,
+                climb_user_id: i32,
                 new_user_name: String,
             }
 
             let update = UserNameUpdate {
-                user_id: user_id as i32,
+                climb_user_id: user_id as i32,
                 new_user_name: "poopyjr".to_string(),
             };
 
@@ -146,7 +146,7 @@ fn test_update_climb_user_user_name() {
 
 
             let update_back = UserNameUpdate {
-                user_id: user_id as i32,
+                climb_user_id: user_id as i32,
                 new_user_name: user_name.parse().unwrap(),
             };
             let json_data = serde_json::to_string(&update_back).unwrap();
@@ -235,7 +235,7 @@ fn test_update_climb_user_user_name_fails_because_user_name_already_exists() {
     assert_eq!(response_code, 200);
 
     if let Some(user_name) = actual_json.get("user_name").and_then(Value::as_str) {
-        if let Some(user_id) = actual_json.get("id").and_then(Value::as_i64) {
+        if let Some(user_id) = actual_json.get("climb_user_id").and_then(Value::as_i64) {
 
             let re = Regex::new(r"^user\d{20}$").unwrap();
 
@@ -303,7 +303,7 @@ fn test_update_climb_user_user_name_fails_because_user_name_already_exists() {
             assert_eq!(response_code, 200);
 
             if let Some(user_name_2) = actual_json.get("user_name").and_then(Value::as_str) {
-                if let Some(user_id_2) = actual_json.get("id").and_then(Value::as_i64) {
+                if let Some(user_id_2) = actual_json.get("climb_user_id").and_then(Value::as_i64) {
                     let re = Regex::new(r"^user\d{20}$").unwrap();
 
                     assert_eq!(true, re.is_match(user_name_2));
@@ -348,12 +348,12 @@ fn test_update_climb_user_user_name_fails_because_user_name_already_exists() {
                     // set json body request
                     #[derive(Serialize)]
                     struct UserNameUpdate {
-                        user_id: i32,
+                        climb_user_id: i32,
                         new_user_name: String,
                     }
 
                     let update = UserNameUpdate {
-                        user_id: user_id_2 as i32,
+                        climb_user_id: user_id_2 as i32,
                         new_user_name: user_name.parse().unwrap(),
                     };
 

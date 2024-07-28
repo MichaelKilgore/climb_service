@@ -18,7 +18,7 @@ pub trait SqlUtils: Send + Sync {
         Ok(0)
     }
 
-    async fn update_climb_user_user_name(&self, _user_id: i32, _new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, _climb_user_id: i32, _new_user_name: String) -> Result<(), SqlError> {
         Ok(())
     }
 }
@@ -60,12 +60,12 @@ impl SqlUtils for SqlUtilsImpl {
         let client = self.connect_and_spawn().await.unwrap();
 
         let query_string = format!("INSERT INTO climb_location(name, profile_pic_location, description, address, latitude, longitude, status, additional_info, moderator_comments)
-                                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}') RETURNING id;", location.name,
+                                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}') RETURNING climb_location_id;", location.name,
                                    location.profile_pic_location, location.description, location.address, coordinates.latitude, 
                                    coordinates.longitude, "IN REVIEW", location.additional_info, "");
 
         let row = client.query_one(&query_string, &[]).await.unwrap();
-        let id: i32 = row.get("id");
+        let id: i32 = row.get("climb_location_id");
 
         return match client.execute(&query_string, &[]).await {
             Ok(_) => Ok(id),
@@ -79,10 +79,10 @@ impl SqlUtils for SqlUtilsImpl {
         let client = self.connect_and_spawn().await.unwrap();
 
         let insert_string = format!("INSERT INTO climb_user(user_name, status, moderator_comments)
-                                       VALUES ('{0}', '{1}', '{2}') RETURNING id;", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
+                                       VALUES ('{0}', '{1}', '{2}') RETURNING climb_user_id;", climb_user.user_name, climb_user.status, climb_user.moderator_comments);
 
         return match client.query_one(&insert_string, &[]).await {
-            Ok(row) => Ok(row.get("id")),
+            Ok(row) => Ok(row.get("climb_user_id")),
             Err(err) => {
                 if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
                     return Err(SqlError::PrimaryKeyAlreadyExists);
@@ -92,12 +92,12 @@ impl SqlUtils for SqlUtilsImpl {
         }
     }
 
-    async fn update_climb_user_user_name(&self, user_id: i32, new_user_name: String) -> Result<(), SqlError> {
+    async fn update_climb_user_user_name(&self, climb_user_id: i32, new_user_name: String) -> Result<(), SqlError> {
         let client = self.connect_and_spawn().await.unwrap();
 
         let query = format!("UPDATE climb_user
                                     SET user_name = '{0}'
-                                    WHERE climb_user_id = '{1}'", new_user_name, user_id);
+                                    WHERE climb_user_id = '{1}'", new_user_name, climb_user_id);
         
         return match client.execute(&query, &[]).await {
             Ok(_) => Ok(()),

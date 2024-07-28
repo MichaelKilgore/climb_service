@@ -26,7 +26,7 @@ async fn create_climb_location_impl<S, T>(sql_utils: &S, google_maps_utils: &T, 
     };
 
     return match sql_utils.create_climb_location(location, coords).await {
-        Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "id": id })),
+        Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "climb_location_id": id })),
         Err(..) => {
             return HttpResponse::InternalServerError().body("Failed to create climb location in sql.");
         }
@@ -82,7 +82,7 @@ mod tests {
         let resp_body = to_bytes(resp.into_body()).await.unwrap();
 
         let actual_json: serde_json::Value = serde_json::from_slice(&resp_body).unwrap();
-        let expected_json = serde_json::json!({ "id": 4 });
+        let expected_json = serde_json::json!({ "climb_location_id": 4 });
 
         assert_eq!(expected_json, actual_json);
     }

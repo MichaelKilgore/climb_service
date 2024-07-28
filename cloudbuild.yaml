@@ -64,11 +64,6 @@ steps:
           --region=${_DEFAULT_REGION} \
           --images=climb_service=gcr.io/${_PROJECT_ID}/my-rust-app:latest \
           --deploy-parameters="google-maps-api-key=${_GOOGLE_MAPS_API_KEY}"
-  - name: 'gcr.io/cloud-builders/skaffold'
-    env:
-      - 'PIPELINE_NAME=${_PIPELINE_NAME}'
-      - 'DEFAULT_REGION=${_DEFAULT_REGION}'
-      - 'PROJECT_ID=${_PROJECT_ID}'
 
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

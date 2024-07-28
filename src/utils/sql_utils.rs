@@ -97,7 +97,7 @@ impl SqlUtils for SqlUtilsImpl {
 
         let query = format!("UPDATE climb_user
                                     SET user_name = '{0}'
-                                    WHERE id = '{1}'", new_user_name, user_id);
+                                    WHERE climb_user_id = '{1}'", new_user_name, user_id);
         
         return match client.execute(&query, &[]).await {
             Ok(_) => Ok(()),

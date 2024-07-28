@@ -16,8 +16,9 @@ futures = "0.3.30"
 async-trait = "0.1"
 rand = "0.8"
 regex = "1.10.4"
+google_maps = "3.5"
 
 [dev-dependencies]
-mockall = "0.12.1"
+mockall = "0.13.0"
 thiserror = "1.0"
 curl = "0.4.46"

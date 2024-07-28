@@ -1,19 +1,19 @@
 use::actix_web::post;
 use::actix_web::HttpResponse;
 use::actix_web::web::Json;
-use crate::model::climbing_location::ClimbingLocation;
+use crate::model::climbing_location::ClimbLocation;
 use crate::utils::google_maps_utils::{GoogleMapsUtils, GoogleMapsUtilsImpl};
 use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
 
-#[post("/create-climbing-location")]
-pub async fn create_climbing_location(location: Json<ClimbingLocation>) -> HttpResponse {
+#[post("/create-climb-location")]
+pub async fn create_climb_location(location: Json<ClimbLocation>) -> HttpResponse {
     let sql_utils = SqlUtilsImpl { db_config: DbConfig::new() };
     let google_maps_utils = GoogleMapsUtilsImpl;
 
-    return create_climbing_location_impl(&sql_utils, &google_maps_utils, location).await;
+    return create_climb_location_impl(&sql_utils, &google_maps_utils, location).await;
 }
 
-async fn create_climbing_location_impl<S, T>(sql_utils: &S, google_maps_utils: &T, location: Json<ClimbingLocation>) -> HttpResponse
+async fn create_climb_location_impl<S, T>(sql_utils: &S, google_maps_utils: &T, location: Json<ClimbLocation>) -> HttpResponse
     where
         S: SqlUtils,
         T: GoogleMapsUtils
@@ -24,11 +24,11 @@ async fn create_climbing_location_impl<S, T>(sql_utils: &S, google_maps_utils: &
             return HttpResponse::InternalServerError().body("Failed to find the address provided.");
         }
     };
-    
-    return match sql_utils.create_climbing_location(location, coords).await {
+
+    return match sql_utils.create_climb_location(location, coords).await {
         Ok(id) => HttpResponse::Ok().json(serde_json::json!({ "id": id })),
         Err(..) => {
-            return HttpResponse::InternalServerError().body("Failed to create climbing location in sql.");
+            return HttpResponse::InternalServerError().body("Failed to create climb location in sql.");
         }
     }
 }
@@ -40,11 +40,11 @@ mod tests {
     use async_trait::async_trait;
     use crate::errors::google_maps_error::GoogleMapsError;
     use crate::errors::sql_error::SqlError;
-    use crate::model::coordinates::Coordinates;    
+    use crate::model::coordinates::Coordinates;
 
     #[actix_web::test]
-    async fn test_create_climbing_location_impl_success_test() {
-        let location = ClimbingLocation {
+    async fn test_create_climb_location_impl_success_test() {
+        let location = ClimbLocation {
             name: "Rocky Peak".to_string(),
             profile_pic_location: "/images/rocky_peak.png".to_string(),
             description: "A popular climbing spot with diverse routes.".to_string(),
@@ -57,13 +57,13 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climbing_location(&self, _location: Json<ClimbingLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
+            async fn create_climb_location(&self, _location: Json<ClimbLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
                 Ok(4)
             }
         }
 
         let sql_utils = SqlUtilsImplMock;
-        
+
         pub struct GoogleMapsUtilsMock;
 
         #[async_trait]
@@ -73,9 +73,9 @@ mod tests {
             }
         }
 
-        let google_maps_utils = GoogleMapsUtilsMock; 
+        let google_maps_utils = GoogleMapsUtilsMock;
 
-        let resp = create_climbing_location_impl(&sql_utils, &google_maps_utils, Json(location)).await;
+        let resp = create_climb_location_impl(&sql_utils, &google_maps_utils, Json(location)).await;
         
         assert_eq!(resp.status(), actix_web::http::StatusCode::OK);
 
@@ -88,8 +88,8 @@ mod tests {
     }
 
     #[actix_web::test]
-    async fn test_create_climbing_location_impl_failure_test() {
-        let location = ClimbingLocation {
+    async fn test_create_climb_location_impl_failure_test() {
+        let location = ClimbLocation {
             name: "Rocky Peak".to_string(),
             profile_pic_location: "/images/rocky_peak.png".to_string(),
             description: "A popular climbing spot with diverse routes.".to_string(),
@@ -102,7 +102,7 @@ mod tests {
 
         #[async_trait]
         impl SqlUtils for SqlUtilsImplMock {
-            async fn create_climbing_location(&self, _location: Json<ClimbingLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
+            async fn create_climb_location(&self, _location: Json<ClimbLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
                 Err(SqlError::UnknownError)
             }
         }
@@ -120,7 +120,7 @@ mod tests {
 
         let google_maps_utils = GoogleMapsUtilsMock;
 
-        let resp = create_climbing_location_impl(&sql_utils, &google_maps_utils, Json(location)).await;
+        let resp = create_climb_location_impl(&sql_utils, &google_maps_utils, Json(location)).await;
 
         assert_eq!(resp.status(), actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
     }

@@ -1,7 +1,7 @@
 use actix_web::web::Json;
 use tokio_postgres::{Client, NoTls};
 use crate::errors::sql_error::SqlError;
-use crate::model::climbing_location::ClimbingLocation;
+use crate::model::climbing_location::ClimbLocation;
 use crate::model::climb_user::ClimbUser;
 use std::env;
 use async_trait::async_trait;
@@ -11,7 +11,7 @@ use crate::model::coordinates::Coordinates;
 #[async_trait]
 pub trait SqlUtils: Send + Sync {
 
-    async fn create_climbing_location(&self, _location: Json<ClimbingLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
+    async fn create_climb_location(&self, _location: Json<ClimbLocation>, _coordinates: Coordinates) -> Result<i32, SqlError> {
         Ok(0)
     }
     async fn create_climb_user(&self, _climb_user: ClimbUser) -> Result<i32, SqlError> {
@@ -56,10 +56,10 @@ pub struct SqlUtilsImpl {
 #[async_trait]
 impl SqlUtils for SqlUtilsImpl {
 
-    async fn create_climbing_location(&self, location: Json<ClimbingLocation>, coordinates: Coordinates) -> Result<i32, SqlError> {
+    async fn create_climb_location(&self, location: Json<ClimbLocation>, coordinates: Coordinates) -> Result<i32, SqlError> {
         let client = self.connect_and_spawn().await.unwrap();
 
-        let query_string = format!("INSERT INTO climbing_location(name, profile_pic_location, description, address, latitude, longitude, status, additional_info, moderator_comments)
+        let query_string = format!("INSERT INTO climb_location(name, profile_pic_location, description, address, latitude, longitude, status, additional_info, moderator_comments)
                                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}') RETURNING id;", location.name,
                                    location.profile_pic_location, location.description, location.address, coordinates.latitude, 
                                    coordinates.longitude, "IN REVIEW", location.additional_info, "");

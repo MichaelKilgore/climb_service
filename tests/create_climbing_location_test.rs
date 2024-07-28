@@ -17,7 +17,7 @@ fn test_create_climbing_location() {
             "http://localhost:8080".to_string()
         }
     };
-    easy.url(&format!("{host}/create-climbing-location")).unwrap();
+    easy.url(&format!("{host}/create-climb-location")).unwrap();
     easy.post(true).unwrap();
 
     // set authentication header

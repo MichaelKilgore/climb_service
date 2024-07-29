@@ -1,8 +1,8 @@
 use std::env;
 use curl::easy::{Easy, List};
-use serde::Serialize;
 use serde_json::Value;
 
+#[allow(dead_code)]
 pub trait IntegTestsUtils {
     fn get_host_url(&self) -> String;
 
@@ -21,6 +21,7 @@ pub trait IntegTestsUtils {
 
 pub struct IntegTestsUtilsImpl;
 
+#[allow(dead_code)]
 impl IntegTestsUtils for IntegTestsUtilsImpl {
      fn get_host_url(&self) -> String {
         // set host
@@ -129,13 +130,13 @@ impl IntegTestsUtils for IntegTestsUtilsImpl {
     }
 
     fn send_update_climb_user_user_name(&self, json_body: Value) -> Easy {
-        let mut easy = Easy::new();        
-        
+        let mut easy = Easy::new();
+
         let host = self.get_host_url();
 
         easy.url(&format!("{host}/update-climb-user-user-name")).unwrap();
         easy.post(true).unwrap();
-        
+
         let id_token = self.get_id_token();
         let mut headers = List::new();
         if !id_token.is_empty() {

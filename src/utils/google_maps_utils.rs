@@ -17,6 +17,10 @@ pub struct GoogleMapsUtilsImpl;
 #[async_trait]
 impl GoogleMapsUtils for GoogleMapsUtilsImpl {
     async fn get_coordinates(&self, address: String) -> Result<Coordinates, GoogleMapsError> {
+        if address.is_empty() {
+            return Err(GoogleMapsError::AddressUnknown);
+        } 
+        
         let google_maps_client = match GoogleMapsClient::try_new(env::var("GOOGLE_MAPS_API_KEY").unwrap()) {
             Ok(client) => client,
             Err(err) => {

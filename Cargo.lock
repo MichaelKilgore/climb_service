@@ -590,6 +590,7 @@ dependencies = [
  "postgres",
  "rand",
  "regex",
+ "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",

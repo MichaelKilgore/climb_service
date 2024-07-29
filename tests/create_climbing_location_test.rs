@@ -1,50 +1,24 @@
-use std::env;
-use curl::easy::{Easy, List};
+mod utils;
+
+use serde_json::json;
+use utils::integ_tests_utils::IntegTestsUtilsImpl;
+use crate::utils::integ_tests_utils::IntegTestsUtils;
 
 #[test]
 fn test_create_climbing_location() {
-    let mut easy = Easy::new();
-
-    // set host
-    let host = match env::var("SERVICE_URL") {
-        Ok(value) => {
-            value
-        }
-        Err(env::VarError::NotPresent) => {
-            "http://localhost:8080".to_string()
-        }
-        Err(env::VarError::NotUnicode(_)) => {
-            "http://localhost:8080".to_string()
-        }
-    };
-    easy.url(&format!("{host}/create-climb-location")).unwrap();
-    easy.post(true).unwrap();
-
-    // set authentication header
-    let id_token = match env::var("ID_TOKEN") {
-        Ok(value) => {
-            value
-        }
-        Err(env::VarError::NotPresent) => {
-            "".to_string()
-        }
-        Err(env::VarError::NotUnicode(_)) => {
-            "".to_string()
-        }
-    };
-    let mut headers = List::new();
-    if !id_token.is_empty() {
-        headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
-    }
-    headers.append("Content-Type: application/json").unwrap();
-    easy.http_headers(headers).unwrap();
     
-    // set json body request
-    let json_data = r#"{"name":"Mount Everest Base Camp","profile_pic_location":"/images/mount-everest.jpg","description":"A popular trekking route in Nepal","address":"Sagarmatha National Park, Nepal","additional_info": "","moderator_comments": ""}"#;
-    easy.post_fields_copy(json_data.as_bytes()).unwrap();
+    let utils = IntegTestsUtilsImpl { };
 
-    // perform request
-    easy.perform().unwrap();
+    let json_body = json!({
+        "name": "Mount Everest Base Camp",
+        "profile_pic_location": "/images/mount-everest.jpg",
+        "description": "A popular trekking route in Nepal",
+        "address": "Sagarmatha National Park, Nepal",
+        "additional_info": "",
+        "moderator_comments": ""
+    });
+    
+    let mut easy = utils.send_create_climb_location_request(json_body);
 
     let response_code = easy.response_code().unwrap();
 

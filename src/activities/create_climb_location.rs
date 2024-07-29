@@ -1,6 +1,7 @@
 use::actix_web::post;
 use::actix_web::HttpResponse;
 use::actix_web::web::Json;
+use crate::errors::google_maps_error::GoogleMapsError;
 use crate::model::climbing_location::ClimbLocation;
 use crate::utils::google_maps_utils::{GoogleMapsUtils, GoogleMapsUtilsImpl};
 use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
@@ -20,7 +21,10 @@ async fn create_climb_location_impl<S, T>(sql_utils: &S, google_maps_utils: &T, 
 {
     let coords = match google_maps_utils.get_coordinates(location.address.clone()).await {
         Ok(coords) => coords,
-        Err(..) => {
+        Err(err) => {
+            if err.eq(&GoogleMapsError::AddressUnknown) {
+                return HttpResponse::BadRequest().json(serde_json::json!({ "error": "AddressUnknown" }));
+            }
             return HttpResponse::InternalServerError().body("Failed to find the address provided.");
         }
     };

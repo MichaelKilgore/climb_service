@@ -7,11 +7,14 @@ pub trait IntegTestsUtils {
 
     fn get_id_token(&self) -> String;
 
+    fn get_response_body(&self, easy: Easy) -> Value;
+
     fn send_create_climb_location_request(&self, json_body: Value) -> Easy;
-    
+
     fn send_create_climb_user(&self) -> Easy;
     
-    fn get_response_body(&self, easy: Easy) -> Value;
+    fn send_hello(&self) -> Easy;
+
 }
 
 pub struct IntegTestsUtilsImpl;
@@ -46,6 +49,20 @@ impl IntegTestsUtils for IntegTestsUtilsImpl {
         };
     }
 
+    fn get_response_body(&self, mut easy: Easy) -> Value {
+        let mut response_body = Vec::new();
+        {
+            let mut transfer = easy.transfer();
+            transfer.write_function(|data| {
+                response_body.extend_from_slice(data);
+                Ok(data.len())
+            }).unwrap();
+            transfer.perform().unwrap();
+        }
+
+        return serde_json::from_slice(&response_body).unwrap();
+    }
+    
     fn send_create_climb_location_request(&self, json_body: Value) -> Easy {
         let mut easy = Easy::new();
 
@@ -70,10 +87,10 @@ impl IntegTestsUtils for IntegTestsUtilsImpl {
     }
 
     fn send_create_climb_user(&self) -> Easy {
-        let mut easy = Easy::new();        
-        
+        let mut easy = Easy::new();
+
         let host = self.get_host_url();
-        
+
         easy.url(&format!("{host}/create-climb-user")).unwrap();
         easy.post(true).unwrap();
 
@@ -84,24 +101,29 @@ impl IntegTestsUtils for IntegTestsUtilsImpl {
             headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
             easy.http_headers(headers).unwrap();
         }
-        
+
         easy.perform().unwrap();
 
         return easy;
     }
 
-    fn get_response_body(&self, mut easy: Easy) -> Value {
-        let mut response_body = Vec::new();
-        {
-            let mut transfer = easy.transfer();
-            transfer.write_function(|data| {
-                response_body.extend_from_slice(data);
-                Ok(data.len())
-            }).unwrap();
-            transfer.perform().unwrap();
+    fn send_hello(&self) -> Easy {
+        let mut easy = Easy::new();
+
+        let host = self.get_host_url();
+
+        easy.url(&format!("{host}/hello")).unwrap();
+
+        let id_token = self.get_id_token();
+        let mut headers = List::new();
+        headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
+        if !id_token.is_empty() {
+            easy.http_headers(headers).unwrap();
         }
 
-        return serde_json::from_slice(&response_body).unwrap();
+        easy.perform().unwrap();
+
+        return easy;
     }
-    
+
 }

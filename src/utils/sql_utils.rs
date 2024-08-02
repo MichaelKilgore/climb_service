@@ -1,11 +1,12 @@
 use actix_web::web::Json;
 use tokio_postgres::{Client, NoTls};
 use crate::errors::sql_error::SqlError;
-use crate::model::climbing_location::ClimbLocation;
+use crate::model::climb_location::ClimbLocation;
 use crate::model::climb_user::ClimbUser;
 use std::env;
 use async_trait::async_trait;
 use tokio_postgres::error::SqlState;
+use crate::model::climb_route::ClimbRoute;
 use crate::model::coordinates::Coordinates;
 
 #[async_trait]
@@ -20,6 +21,10 @@ pub trait SqlUtils: Send + Sync {
 
     async fn update_climb_user_user_name(&self, _climb_user_id: i32, _new_user_name: String) -> Result<(), SqlError> {
         Ok(())
+    }
+
+    async fn create_climb_route(&self, _climb_route: Json<ClimbRoute>) -> Result<i32, SqlError> {
+        Ok(0)
     }
 }
 
@@ -109,6 +114,26 @@ impl SqlUtils for SqlUtilsImpl {
             }
         }
     }
+
+    async fn create_climb_route(&self, climb_route: Json<ClimbRoute>) -> Result<i32, SqlError> {
+        let client = self.connect_and_spawn().await.unwrap();
+
+        let query_string = format!("INSERT INTO climb_route(name, grade, climb_location_id,
+        latitude, longitude, description, video_link, climb_user_id)
+         VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}') RETURNING climb_route_id;",
+                                   climb_route.name, climb_route.grade, climb_route.climb_location_id,
+                                   climb_route.latitude, climb_route.longitude, climb_route.description,
+                                   climb_route.video_link, climb_route.climb_user_id);
+        return match client.query_one(&query_string, &[]).await {
+            Ok(row) => Ok(row.get("climb_route_id")),
+            Err(err) => {
+                //TODO: Need special error type when video link is invalid
+                println!("{}", format!("Received the following error: Attempting to create a climb route {err}"));
+                return Err(SqlError::UnknownError);
+            }
+        }
+    }
+
 }
 
 impl SqlUtilsImpl {

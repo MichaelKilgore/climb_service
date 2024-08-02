@@ -2,7 +2,7 @@ use::actix_web::post;
 use::actix_web::HttpResponse;
 use::actix_web::web::Json;
 use crate::errors::google_maps_error::GoogleMapsError;
-use crate::model::climbing_location::ClimbLocation;
+use crate::model::climb_location::ClimbLocation;
 use crate::utils::google_maps_utils::{GoogleMapsUtils, GoogleMapsUtilsImpl};
 use crate::utils::sql_utils::{DbConfig, SqlUtils, SqlUtilsImpl};
 

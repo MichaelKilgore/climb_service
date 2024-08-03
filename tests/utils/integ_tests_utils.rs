@@ -19,6 +19,8 @@ pub trait IntegTestsUtils {
     fn send_hello(&self) -> Easy;
 
     fn send_update_climb_user_user_name(&self, json_body: Value) -> Easy;
+
+    fn send_verification_code(&self, json_body: Value) -> Easy;
 }
 
 pub struct IntegTestsUtilsImpl;
@@ -176,5 +178,29 @@ impl IntegTestsUtils for IntegTestsUtilsImpl {
 
         return easy;
     }
+
+    fn send_verification_code(&self, json_body: Value) -> Easy {
+        let mut easy = Easy::new();
+
+        let host = self.get_host_url();
+
+        easy.url(&format!("{host}/send-verification-code")).unwrap();
+        easy.post(true).unwrap();
+
+        let id_token = self.get_id_token();
+        let mut headers = List::new();
+        if !id_token.is_empty() {
+            headers.append(&format!("Authorization: Bearer {}", id_token)).unwrap();
+        }
+        headers.append("Content-Type: application/json").unwrap();
+        easy.http_headers(headers).unwrap();
+
+        easy.post_fields_copy(serde_json::to_string(&json_body).unwrap().as_bytes()).unwrap();
+
+        easy.perform().unwrap();
+
+        return easy;
+    }
+
 
 }

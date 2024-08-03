@@ -21,6 +21,14 @@ curl -X POST \
 
 curl http://127.0.0.1:8080/hello
 
+### send-verification-code
+
+./cloud-sql-proxy --port 5432 climbing-app-426701:us-central1:beta-postgres-instance
+
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -d @test_payloads/send_verification_code.json \
+     http://127.0.0.1:8080/send-verification-code
 
 ## Remote Test Commands
 

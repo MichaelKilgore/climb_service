@@ -18,6 +18,9 @@ rand = "0.8"
 regex = "1.10.4"
 google_maps = "3.5"
 rust_decimal = "1.25.0"
+reqwest = { version = "0.12.5", features = ["blocking", "json"] }
+base64 = "0.21.7"
+hyper = "1.4.1"
 
 [dev-dependencies]
 mockall = "0.13.0"

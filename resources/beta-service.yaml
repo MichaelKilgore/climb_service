@@ -21,4 +21,10 @@ spec:
             value: /cloudsql/climbing-app-426701:us-central1:beta-postgres-instance
           - name: GOOGLE_MAPS_API_KEY
             value: DUMMY_KEY # from-param: ${google-maps-api-key}
+          - name: TWILIO_ACCOUNT_SERVICE_ID
+            value: DUMMY_KEY # from-param: ${twilio-account-service-id}
+          - name: TWILIO_VERIFY_SERVICE_ID
+            value: DUMMY_KEY # from-param: ${twilio-verify-service-id}
+          - name: TWILIO_AUTH_TOKEN
+            value: DUMMY_KEY # from-param: ${twilio-auth-token}
 

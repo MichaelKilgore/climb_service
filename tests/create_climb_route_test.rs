@@ -3,7 +3,6 @@ mod utils;
 use serde_json::json;
 use utils::integ_tests_utils::IntegTestsUtilsImpl;
 use crate::utils::integ_tests_utils::IntegTestsUtils;
-use regex::Regex;
 
 #[test]
 fn test_create_climb_route_success() {
@@ -20,24 +19,17 @@ fn test_create_climb_route_success() {
         "moderator_comments": ""
     });
 
-    let mut easy = utils.send_create_climb_location_request(climb_location_json);
+    let easy = utils.send_create_climb_location_request(climb_location_json);
     let response_body = utils.get_response_body(easy);
     let climb_location_id = response_body.get("climb_location_id").unwrap().as_i64().unwrap();
 
 
     //Create a user
-    let mut easy = utils.send_create_climb_user();
-    // let response_code = easy.response_code().unwrap();
-    // assert_eq!(response_code, 200);
+    let easy = utils.send_create_climb_user();
 
     let response_body = utils.get_response_body(easy);
-    // let user_name = response_body.get("user_name").unwrap().as_str().unwrap();
-    // let re = Regex::new(r"^user\d{20}$").unwrap();
-    // assert_eq!(true, re.is_match(&user_name));
 
     let climb_user_id = response_body.get("climb_user_id").unwrap().as_i64().unwrap();
-    // let re = Regex::new(r"^\d").unwrap();
-    // assert_eq!(true, re.is_match(&*climb_user_id.to_string()));
 
     //Create route with previous IDs
     let json_body = json!({

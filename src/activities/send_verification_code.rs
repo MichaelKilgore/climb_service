@@ -3,11 +3,11 @@ use actix_web::post;
 use actix_web::web::Json;
 use regex::Regex;
 use crate::model::send_verification_code::SendVerificationCode;
-use crate::utils::twilio_utils::{TwilioUtils, TwilioUtilsImpl};
+use crate::utils::twilio_utils::{TwilioConfig, TwilioUtils, TwilioUtilsImpl};
 
 #[post("/send-verification-code")]
 pub async fn send_verification_code(body: Json<SendVerificationCode>) -> HttpResponse {
-    let twilio_util = TwilioUtilsImpl { };
+    let twilio_util = TwilioUtilsImpl { twilio_config: TwilioConfig::new() };
     
     return send_verification_code_impl(body, &twilio_util).await;
 }

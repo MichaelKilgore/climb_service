@@ -27,4 +27,6 @@ spec:
             value: DUMMY_KEY # from-param: ${twilio-verify-service-id}
           - name: TWILIO_AUTH_TOKEN
             value: DUMMY_KEY # from-param: ${twilio-auth-token}
+          - name: CLOUD_RUN_NAME
+            value: DUMMY_KEY # from-param: ${beta-cloud-run-name}
 

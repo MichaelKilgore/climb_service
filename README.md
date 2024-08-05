@@ -30,6 +30,13 @@ curl -X POST \
      -d @test_payloads/send_verification_code.json \
      http://127.0.0.1:8080/send-verification-code
 
+### verify-phone-number
+
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -d @test_payloads/verify_phone_number.json \
+     http://127.0.0.1:8080/verify-phone-number
+
 ## Remote Test Commands
 
 ### create-climbing-location
@@ -47,6 +54,14 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta
 ### create-climb-user
 
 curl -X POST -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://beta.climb-service.dev/create-climb-user
+
+### send-verification-code
+
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+     -d @test_payloads/send_verification_code.json \
+     https://beta.climb-service.dev/send-verification-code
 
 ## Run Integration Tests Locally
 

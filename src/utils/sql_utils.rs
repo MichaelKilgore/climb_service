@@ -26,6 +26,10 @@ pub trait SqlUtils: Send + Sync {
     async fn create_climb_route(&self, _climb_route: Json<ClimbRoute>) -> Result<i32, SqlError> {
         Ok(0)
     }
+
+    async fn set_phone_number_for_climb_user(&self, _climb_user_id: i32, _phone_number: String) -> Result<(), SqlError> {
+        Ok(())
+    }
 }
 
 #[derive(Clone)]
@@ -128,7 +132,39 @@ impl SqlUtils for SqlUtilsImpl {
             Ok(row) => Ok(row.get("climb_route_id")),
             Err(err) => {
                 //TODO: Need special error type when video link is invalid
-                println!("{}", format!("Received the following error: Attempting to create a climb route {err}"));
+                eprintln!("{}", format!("Received the following error: Attempting to create a climb route {err}"));
+                return Err(SqlError::UnknownError);
+            }
+        }
+    }
+
+    async fn set_phone_number_for_climb_user(&self, climb_user_id: i32, phone_number: String) -> Result<(), SqlError> {
+        let client = self.connect_and_spawn().await.unwrap();
+
+        /* Retains previous status if user revalidates phone number to prevent restoration of revoked CONTRIBUTOR status.
+           We are assuming that a new user with the same phone_number is the same person. */
+        let query_string = format!("DO $$
+                                            DECLARE
+                                                v_status VARCHAR(50);
+                                                v_phone_number VARCHAR(17) := '{phone_number}';
+                                            BEGIN
+                                                SELECT status
+                                                INTO v_status
+                                                FROM climb_user
+                                                WHERE phone_number = v_phone_number AND status != 'CONTRIBUTOR'
+                                                LIMIT 1;
+
+                                                UPDATE climb_user
+                                                SET
+                                                    phone_number = '{phone_number}',
+                                                    status = COALESCE(v_status, 'CONTRIBUTOR')
+                                                WHERE climb_user_id = {climb_user_id};
+                                            END $$;");
+
+        return match client.execute(&query_string, &[]).await {
+            Ok(_) => Ok(()),
+            Err(err) => {
+                eprintln!("Received the following error: {err}"); 
                 return Err(SqlError::UnknownError);
             }
         }

@@ -28,7 +28,7 @@ async fn create_climb_user_impl<S>(sql_utils: &S) -> HttpResponse
     let user = ClimbUser {
         user_name: user_name.clone(),
         phone_number: "".to_string(),
-        status: "COMMENTOR".to_string(),
+        status: "VIEWER".to_string(),
         moderator_comments: "".to_string()
     };
 

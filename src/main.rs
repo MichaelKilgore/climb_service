@@ -12,6 +12,7 @@ use crate::activities::create_climb_route::create_climb_route;
 use crate::activities::hello_world::hello;
 use crate::activities::update_climb_user_user_name::update_climb_user_user_name;
 use crate::activities::send_verification_code::send_verification_code;
+use crate::activities::verify_phone_number::verify_phone_number;
 
 mod activities;
 mod model;
@@ -34,6 +35,7 @@ async fn main() -> io::Result<()>  {
             .service(hello)
             .service(create_climb_route)
             .service(send_verification_code)
+            .service(verify_phone_number)
     })
         .bind("0.0.0.0:8080")?
         .run()

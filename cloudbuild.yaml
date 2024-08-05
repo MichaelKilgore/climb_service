@@ -33,7 +33,7 @@ steps:
           --platform=managed \
           --no-allow-unauthenticated \
           --add-cloudsql-instances=climbing-app-426701:us-central1:beta-postgres-instance \
-          --set-env-vars=DB_USER=postgres,DB_PASSWORD=postgres,DB_NAME=postgres,SQL_CONNECTION_NAME=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance,GOOGLE_MAPS_API_KEY=${_GOOGLE_MAPS_API_KEY},TWILIO_ACCOUNT_SERVICE_ID=${_TWILIO_ACCOUNT_SERVICE_ID},TWILIO_VERIFY_SERVICE_ID=${_TWILIO_VERIFY_SERVICE_ID},TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN}
+          --set-env-vars=DB_USER=postgres,DB_PASSWORD=postgres,DB_NAME=postgres,SQL_CONNECTION_NAME=/cloudsql/climbing-app-426701:us-central1:beta-postgres-instance,GOOGLE_MAPS_API_KEY=${_GOOGLE_MAPS_API_KEY},TWILIO_ACCOUNT_SERVICE_ID=${_TWILIO_ACCOUNT_SERVICE_ID},TWILIO_VERIFY_SERVICE_ID=${_TWILIO_VERIFY_SERVICE_ID},TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN},CLOUD_RUN_NAME=integ-cloud-run
 
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
@@ -63,7 +63,7 @@ steps:
           --delivery-pipeline=${_PIPELINE_NAME} \
           --region=${_DEFAULT_REGION} \
           --images=climb_service=gcr.io/${_PROJECT_ID}/my-rust-app:latest \
-          --deploy-parameters="google-maps-api-key=${_GOOGLE_MAPS_API_KEY},twilio-account-service-id=${_TWILIO_ACCOUNT_SERVICE_ID},twilio-verify-service-id=${_TWILIO_VERIFY_SERVICE_ID},twilio-auth-token=${_TWILIO_AUTH_TOKEN}"
+          --deploy-parameters="google-maps-api-key=${_GOOGLE_MAPS_API_KEY},twilio-account-service-id=${_TWILIO_ACCOUNT_SERVICE_ID},twilio-verify-service-id=${_TWILIO_VERIFY_SERVICE_ID},twilio-auth-token=${_TWILIO_AUTH_TOKEN}",beta-cloud-run-name=beta-cloud-run,prod-cloud-run-name=prod-cloud-run
 
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
